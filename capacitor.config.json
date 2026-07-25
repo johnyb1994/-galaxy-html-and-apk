@@ -1,0 +1,14 @@
+{
+  "appId": "com.galaxyoutlast.game",
+  "appName": "Galaxy Outlast",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "hostname": "localhost"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}

@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build outputs (keep root APKs)
+android/app/build/
+android/build/
+android/.gradle/
+.gradle/
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+*.log

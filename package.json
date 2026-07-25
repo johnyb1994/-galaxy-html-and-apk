@@ -1,0 +1,16 @@
+{
+  "name": "galaxy-outlast",
+  "version": "1.0.0",
+  "description": "Galaxy Outlast Mobile Game",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build step required for static assets'"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.1",
+    "@capacitor/core": "^7.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.1"
+  }
+}

@@ -1,0 +1,20 @@
+import javax.net.ssl.*
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+
+class TrustAllManager implements X509TrustManager {
+    X509Certificate[] getAcceptedIssuers() { return null }
+    void checkClientTrusted(X509Certificate[] certs, String authType) {}
+    void checkServerTrusted(X509Certificate[] certs, String authType) {}
+}
+
+try {
+    TrustManager[] trustAllCerts = [new TrustAllManager()] as TrustManager[]
+    SSLContext sc = SSLContext.getInstance("TLS")
+    sc.init(null, trustAllCerts, new SecureRandom())
+    SSLContext.setDefault(sc)
+    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+    HttpsURLConnection.setDefaultHostnameVerifier({ String hostname, SSLSession session -> true } as HostnameVerifier)
+} catch (Throwable t) {
+    println "TrustAll failed: " + t
+}
