@@ -7,12 +7,19 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
+import android.webkit.WebView;
+import android.webkit.WebSettings;
 
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideSystemUI();
+        if (this.bridge != null && this.bridge.getWebView() != null) {
+            WebView webView = this.bridge.getWebView();
+            webView.clearCache(true);
+            webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        }
     }
 
     @Override
