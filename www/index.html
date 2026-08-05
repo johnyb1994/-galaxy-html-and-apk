@@ -50,7 +50,7 @@ html, body, canvas, #wrap {
   overscroll-behavior: none !important;
 }
 
-@import"https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Outfit:wght@400;500;700&display=swap";*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-feature-settings:"liga" 0,"clig" 0,"dlig" 0,"calt" 0;font-variant-ligatures:none;-webkit-text-size-adjust:100%!important;-moz-text-size-adjust:100%!important;text-size-adjust:100%!important}button,input,select,textarea{font-family:inherit}html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;-webkit-text-size-adjust:100%!important;-moz-text-size-adjust:100%!important;text-size-adjust:100%!important;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}body{display:flex;justify-content:center;align-items:center;font-family:Cinzel,serif;font-variant-ligatures:none;transform:translateZ(0);will-change:transform}#wrap{position:absolute;left:50%;top:50%;transform:translate3d(-50%,-50%,0);width:433px;height:915px;overflow:hidden;touch-action:none;transform-origin:center center;flex-shrink:0;will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}canvas#c{display:block;position:absolute;top:86px;left:0;width:100%;height:calc(100% - 86px);touch-action:none;transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;image-rendering:auto}.ach-ship-canvas{display:block;position:relative;width:40px;height:40px}#hud{position:absolute;top:0;left:0;right:0;padding:28px 16px 0;display:grid;grid-template-columns:auto 1fr auto;align-items:center;pointer-events:none;z-index:5;background:#00050ad9;border-bottom:2.5px solid #003d5c;opacity:.95}.hud-left{display:flex;flex-direction:column;gap:6px}.hud-bars-row{display:flex;align-items:center;gap:12px}.hud-bar-group{display:flex;flex-direction:column;gap:2px}.hud-lbl{font-size:8px;color:#0c8;letter-spacing:1.5px;text-transform:uppercase;font-family:Cinzel Decorative,serif;text-shadow:0 0 4px rgba(0,204,136,.5);font-weight:600}#exp-lbl{color:#0af;text-shadow:0 0 4px rgba(0,170,255,.5)}.hud-bar-wrap{position:relative;width:80px;height:14px;border-radius:4px;background:#000a14;overflow:hidden}.hud-bar-wrap.hp-bar{border:1.5px solid #00cc88;box-shadow:0 0 6px #0c83}.hud-bar-wrap.xp-bar{border:1.5px solid #00aaff;box-shadow:0 0 6px #0af3}.hud-bar-fill{height:100%;transition:width .15s}#hp-fill{background:linear-gradient(90deg,#063,#0f8);box-shadow:0 0 4px #0f89}#xp-fill{background:linear-gradient(90deg,#038,#0af);box-shadow:0 0 4px #0af9;transition:width .2s}.hud-bar-val{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:Cinzel,serif;color:#fff;text-shadow:0 0 3px #000000;letter-spacing:.5px;pointer-events:none;font-weight:600}#lvl-lbl{font-family:Cinzel Decorative,serif;font-size:10px;color:#00e5ff;text-shadow:0 0 8px rgba(0,229,255,.7);font-weight:700;margin-top:8px;letter-spacing:1px}.hud-badges-time-row{display:flex;align-items:center;gap:12px;margin-top:2px}#max-badges{display:flex;gap:3px}.eq-square{width:18px;height:18px;border-radius:3px;border:1px solid #003d5c;background:#000a1499;display:flex;align-items:center;justify-content:center;position:relative}.eq-square.unlocked{border-color:#0af;box-shadow:0 0 4px #00aaff4d}.eq-square.maxed{border-color:#fa0;box-shadow:0 0 6px #fa06}.eq-icon{font-size:11px}.eq-lvl{position:absolute;bottom:-1px;right:2px;font-size:7px;color:#f50;font-weight:700}.hud-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;justify-self:center}#time-wrap{display:flex;align-items:center;gap:4.5px;font-family:Cinzel,serif;color:#fff;font-size:13px;font-weight:700;letter-spacing:.5px;text-shadow:0 0 6px rgba(255,255,255,.45);margin-top:0;flex-shrink:0}#time-lbl{font-family:Cinzel,serif;font-variant-numeric:tabular-nums}#boss-warn{font-family:Cinzel Decorative,serif;font-size:9px;color:#f30;text-shadow:0 0 8px #f30;opacity:0;transition:opacity .3s;margin-top:2px}#boss-warn.show{opacity:1}.hud-right{display:flex;align-items:center;gap:16px}.hud-scores-col{display:flex;flex-direction:column;align-items:flex-end;gap:2px;width:auto;flex-shrink:0;flex-grow:0}#hi-row{display:flex;justify-content:flex-end;gap:6px;width:auto;align-items:center;font-size:13px;color:#fa0;font-weight:700;letter-spacing:1px;text-shadow:0 0 4px rgba(255,170,0,.3);white-space:nowrap}#hi-val{color:gold;font-weight:700;font-family:Cinzel,serif;font-variant-numeric:tabular-nums}#score-row{display:flex;justify-content:space-between;width:96px;align-items:center;font-size:13px;color:orange;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,165,0,.5);white-space:nowrap}#score-lbl{color:#fc2;font-family:Cinzel,serif;font-weight:700;font-variant-numeric:tabular-nums}.hud-wave-col{display:flex;flex-direction:column;align-items:center;justify-content:center}#fps-lbl{display:none!important;font-family:Courier New,monospace;color:#0f8;font-size:9px;opacity:.8;margin-bottom:2px;text-shadow:0 0 4px rgba(0,255,136,.4)}#wave-lbl{font-family:Cinzel Decorative,serif;font-size:15px;color:#0f8;text-shadow:0 0 10px #0f8,0 0 20px rgba(0,255,136,.3);font-weight:900;letter-spacing:2px;text-align:center;line-height:1.1}#kill-row{display:none}#pause-btn{position:absolute;bottom:20px;right:20px;top:auto;left:auto;transform:none;z-index:10;background:#000000a6;border:1px solid #035;border-radius:50%;width:36px;height:36px;display:none;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;padding:0}#pause-btn.active{display:flex}#pause-btn span{display:flex;gap:3px;align-items:center}#pause-btn span i{display:block;width:3px;height:12px;background:#0c8;border-radius:1px}#settings-screen{background:#000c;z-index:4000;overflow-y:hidden}.modal-window{width:min(400px,92vw);background:#020b16!important;border:2px solid #00ffaa;border-radius:12px;padding:24px 20px;box-shadow:0 0 30px #00ffaa4d,inset 0 0 15px #00ffaa0d;display:flex;flex-direction:column;align-items:center;gap:16px;box-sizing:border-box}#achievements-screen{z-index:4000}.settings-section{width:100%;max-width:min(400px,92vw);margin:10px 0}.settings-section-lbl{font-family:Cinzel Decorative,serif;font-size:clamp(15px,3.2vw,18px);color:#00886a;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #013}.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,50,80,.3)}.settings-label{font-family:Cinzel,serif;font-size:clamp(15px,3.2vw,17px);color:#6ca}.toggle-btn{font-family:Cinzel,serif;font-size:clamp(13px,3vw,16px);border-radius:14px;padding:6px 16px;cursor:pointer;touch-action:manipulation;border:1px solid #035;background:#000a1499;color:#468;letter-spacing:1px}.toggle-btn.on{background:linear-gradient(135deg,#032,#064);border-color:#0c8;color:#afd}.pool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%;max-width:min(400px,92vw)}.pool-item{display:flex;align-items:center;gap:8px;background:#00050f99;border:1px solid #013;border-radius:6px;padding:8px 10px;cursor:pointer;touch-action:manipulation}.pool-item.disabled{opacity:.4;border-color:#012}.pool-item.enabled{border-color:#035;opacity:1}.pool-item-icon{font-size:16px}.pool-item-name{font-family:Cinzel,serif;font-size:clamp(13px,2.8vw,15px);color:#6a8;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pool-check{font-size:12px;color:#0c8}input[type=range]{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#00ffaa26!important;border-radius:4px;outline:none;height:6px!important}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#0fa;cursor:pointer;box-shadow:0 0 6px #0fac;margin-top:0}input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:#0fa;cursor:pointer;box-shadow:0 0 6px #0fac}#boss-tuner-panel input[type=range]::-webkit-slider-thumb{background:#f60!important;box-shadow:0 0 6px #f60c}#boss-tuner-panel input[type=range]::-moz-range-thumb{background:#f60!important;box-shadow:0 0 6px #f60c}#boss-tuner-panel input[type=range].custom-boss-slider::-webkit-slider-thumb{background:#8bc!important;box-shadow:0 0 6px #8bcc}#boss-tuner-panel input[type=range].custom-boss-slider::-moz-range-thumb{background:#8bc!important;box-shadow:0 0 6px #8bcc}#enc-screen{background:#000000f7;z-index:4000;overflow:hidden;padding-top:45px;justify-content:flex-start}#enc-card-display{width:100%;max-width:min(340px,92vw);flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start}.enc-solo-card{width:100%;max-width:min(395px,94vw);height:auto;max-height:100%;background:linear-gradient(160deg,#050818,#0a0f2a);border:1px solid #003355;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;justify-content:flex-start;box-sizing:border-box}.enc-solo-header{display:flex;align-items:center;gap:12px}.enc-solo-icon{font-size:clamp(32px,10vw,44px)}.enc-solo-titles{display:flex;flex-direction:column;gap:4px;flex:1}.enc-solo-name{font-family:Cinzel Decorative,serif;font-size:clamp(18px,4.5vw,22px);color:#6fa;line-height:1.2;font-variant-ligatures:none;font-feature-settings:"liga" 0,"clig" 0,"dlig" 0;letter-spacing:2px;text-transform:uppercase}.enc-solo-cap{font-size:clamp(14px,2.8vw,16px);color:#468;font-family:Cinzel,serif;letter-spacing:1px}.enc-solo-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,#003355,transparent)}.enc-solo-card { height: 100% !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; padding: 10px 12px !important; overflow: hidden !important; }
+@import"https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Outfit:wght@400;500;700&display=swap";*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-feature-settings:"liga" 0,"clig" 0,"dlig" 0,"calt" 0;font-variant-ligatures:none;-webkit-text-size-adjust:100%!important;-moz-text-size-adjust:100%!important;text-size-adjust:100%!important}button,input,select,textarea{font-family:inherit}html,body{width:100%;height:100%;background:#000;overflow:hidden;position:fixed;-webkit-text-size-adjust:100%!important;-moz-text-size-adjust:100%!important;text-size-adjust:100%!important;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}body{display:flex;justify-content:center;align-items:center;font-family:Cinzel,serif;font-variant-ligatures:none;transform:translateZ(0);will-change:transform}#wrap{position:absolute;left:50%;top:50%;transform:translate3d(-50%,-50%,0);width:433px;height:915px;overflow:hidden;touch-action:none;transform-origin:center center;flex-shrink:0;will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}canvas#c{display:block;position:absolute;top:86px;left:0;width:100%;height:calc(100% - 86px);touch-action:none;transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;image-rendering:auto}.ach-ship-canvas{display:block;position:relative;width:40px;height:40px}#hud{position:absolute;top:0;left:0;right:0;padding:28px 16px 0;display:grid;grid-template-columns:auto 1fr auto;align-items:center;pointer-events:none;z-index:5;background:#00050ad9;border-bottom:2.5px solid #003d5c;opacity:.95}.hud-left{display:flex;flex-direction:column;gap:6px}.hud-bars-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}.hud-bar-group{display:flex;flex-direction:column;gap:2px}.hud-lbl{font-size:8px;color:#0c8;letter-spacing:1.5px;text-transform:uppercase;font-family:Cinzel Decorative,serif;text-shadow:0 0 4px rgba(0,204,136,.5);font-weight:600}#exp-lbl{color:#0af;text-shadow:0 0 4px rgba(0,170,255,.5)}.hud-bar-wrap{position:relative;width:80px;height:14px;border-radius:4px;background:#000a14;overflow:hidden}.hud-bar-wrap.hp-bar{border:1.5px solid #00cc88;box-shadow:0 0 6px #0c83}.hud-bar-wrap.xp-bar{border:1.5px solid #00aaff;box-shadow:0 0 6px #0af3}.hud-bar-fill{height:100%;transition:width .15s}#hp-fill{background:linear-gradient(90deg,#063,#0f8);box-shadow:0 0 4px #0f89}#xp-fill{background:linear-gradient(90deg,#038,#0af);box-shadow:0 0 4px #0af9;transition:width .2s}.hud-bar-val{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:Cinzel,serif;color:#fff;text-shadow:0 0 3px #000000;letter-spacing:.5px;pointer-events:none;font-weight:600}#lvl-lbl{font-family:Cinzel Decorative,serif;font-size:10px;color:#00e5ff;text-shadow:0 0 8px rgba(0,229,255,.7);font-weight:700;margin-top:8px;letter-spacing:1px;white-space:nowrap!important;display:inline-flex!important;align-items:center!important;flex-shrink:0!important}#lvl-val-text{white-space:nowrap!important;display:inline-block!important}.hud-badges-time-row{display:flex;align-items:center;gap:12px;margin-top:2px}#max-badges{display:flex;gap:3px}.eq-square{width:18px;height:18px;border-radius:3px;border:1px solid #003d5c;background:#000a1499;display:flex;align-items:center;justify-content:center;position:relative}.eq-square.unlocked{border-color:#0af;box-shadow:0 0 4px #00aaff4d}.eq-square.maxed{border-color:#fa0;box-shadow:0 0 6px #fa06}.eq-icon{font-size:11px}.eq-lvl{position:absolute;bottom:-1px;right:2px;font-size:7px;color:#f50;font-weight:700}.hud-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;justify-self:center}#time-wrap{display:flex;align-items:center;gap:4.5px;font-family:Cinzel,serif;color:#fff;font-size:13px;font-weight:700;letter-spacing:.5px;text-shadow:0 0 6px rgba(255,255,255,.45);margin-top:0;flex-shrink:0}#time-lbl{font-family:Cinzel,serif;font-variant-numeric:tabular-nums}#boss-warn{font-family:Cinzel Decorative,serif;font-size:9px;color:#f30;text-shadow:0 0 8px #f30;opacity:0;transition:opacity .3s;margin-top:2px}#boss-warn.show{opacity:1}.hud-right{display:flex;align-items:center;gap:16px}.hud-scores-col{display:flex;flex-direction:column;align-items:flex-end;gap:2px;width:auto;flex-shrink:0;flex-grow:0}#hi-row{display:flex;justify-content:flex-end;gap:6px;width:auto;align-items:center;font-size:13px;color:#fa0;font-weight:700;letter-spacing:1px;text-shadow:0 0 4px rgba(255,170,0,.3);white-space:nowrap}#hi-val{color:gold;font-weight:700;font-family:Cinzel,serif;font-variant-numeric:tabular-nums}#score-row{display:flex;justify-content:space-between;width:96px;align-items:center;font-size:13px;color:orange;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,165,0,.5);white-space:nowrap}#score-lbl{color:#fc2;font-family:Cinzel,serif;font-weight:700;font-variant-numeric:tabular-nums}.hud-wave-col{display:flex;flex-direction:column;align-items:center;justify-content:center}#fps-lbl{display:none!important;font-family:Courier New,monospace;color:#0f8;font-size:9px;opacity:.8;margin-bottom:2px;text-shadow:0 0 4px rgba(0,255,136,.4)}#wave-lbl{font-family:Cinzel Decorative,serif;font-size:15px;color:#0f8;text-shadow:0 0 10px #0f8,0 0 20px rgba(0,255,136,.3);font-weight:900;letter-spacing:2px;text-align:center;line-height:1.1}#kill-row{display:none}#pause-btn{position:absolute;bottom:20px;right:20px;top:auto;left:auto;transform:none;z-index:10;background:#000000a6;border:1px solid #035;border-radius:50%;width:36px;height:36px;display:none;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;padding:0}#pause-btn.active{display:flex}#pause-btn span{display:flex;gap:3px;align-items:center}#pause-btn span i{display:block;width:3px;height:12px;background:#0c8;border-radius:1px}#settings-screen{background:#000c;z-index:4000;overflow-y:hidden}.modal-window{width:min(400px,92vw);background:#020b16!important;border:2px solid #00ffaa;border-radius:12px;padding:24px 20px;box-shadow:0 0 30px #00ffaa4d,inset 0 0 15px #00ffaa0d;display:flex;flex-direction:column;align-items:center;gap:16px;box-sizing:border-box}#achievements-screen{z-index:4000}.settings-section{width:100%;max-width:min(400px,92vw);margin:10px 0}.settings-section-lbl{font-family:Cinzel Decorative,serif;font-size:clamp(15px,3.2vw,18px);color:#00886a;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #013}.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,50,80,.3)}.settings-label{font-family:Cinzel,serif;font-size:clamp(15px,3.2vw,17px);color:#6ca}.toggle-btn{font-family:Cinzel,serif;font-size:clamp(13px,3vw,16px);border-radius:14px;padding:6px 16px;cursor:pointer;touch-action:manipulation;border:1px solid #035;background:#000a1499;color:#468;letter-spacing:1px}.toggle-btn.on{background:linear-gradient(135deg,#032,#064);border-color:#0c8;color:#afd}.pool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%;max-width:min(400px,92vw)}.pool-item{display:flex;align-items:center;gap:8px;background:#00050f99;border:1px solid #013;border-radius:6px;padding:8px 10px;cursor:pointer;touch-action:manipulation}.pool-item.disabled{opacity:.4;border-color:#012}.pool-item.enabled{border-color:#035;opacity:1}.pool-item-icon{font-size:16px}.pool-item-name{font-family:Cinzel,serif;font-size:clamp(13px,2.8vw,15px);color:#6a8;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pool-check{font-size:12px;color:#0c8}input[type=range]{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#00ffaa26!important;border-radius:4px;outline:none;height:6px!important}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#0fa;cursor:pointer;box-shadow:0 0 6px #0fac;margin-top:0}input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:#0fa;cursor:pointer;box-shadow:0 0 6px #0fac}#boss-tuner-panel input[type=range]::-webkit-slider-thumb{background:#f60!important;box-shadow:0 0 6px #f60c}#boss-tuner-panel input[type=range]::-moz-range-thumb{background:#f60!important;box-shadow:0 0 6px #f60c}#boss-tuner-panel input[type=range].custom-boss-slider::-webkit-slider-thumb{background:#8bc!important;box-shadow:0 0 6px #8bcc}#boss-tuner-panel input[type=range].custom-boss-slider::-moz-range-thumb{background:#8bc!important;box-shadow:0 0 6px #8bcc}#enc-screen{background:#000000f7;z-index:4000;overflow:hidden;padding-top:45px;justify-content:flex-start}#enc-card-display{width:100%;max-width:min(340px,92vw);flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start}.enc-solo-card{width:100%;max-width:min(395px,94vw);height:auto;max-height:100%;background:linear-gradient(160deg,#050818,#0a0f2a);border:1px solid #003355;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;justify-content:flex-start;box-sizing:border-box}.enc-solo-header{display:flex;align-items:center;gap:12px}.enc-solo-icon{font-size:clamp(32px,10vw,44px)}.enc-solo-titles{display:flex;flex-direction:column;gap:4px;flex:1}.enc-solo-name{font-family:Cinzel Decorative,serif;font-size:clamp(18px,4.5vw,22px);color:#6fa;line-height:1.2;font-variant-ligatures:none;font-feature-settings:"liga" 0,"clig" 0,"dlig" 0;letter-spacing:2px;text-transform:uppercase}.enc-solo-cap{font-size:clamp(14px,2.8vw,16px);color:#468;font-family:Cinzel,serif;letter-spacing:1px}.enc-solo-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,#003355,transparent)}.enc-solo-card { height: 100% !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; padding: 10px 12px !important; overflow: hidden !important; }
 .enc-levels-list { display: flex !important; flex-direction: column !important; justify-content: space-around !important; flex: 1 !important; overflow: hidden !important; gap: 3px !important; padding-right: 0 !important; }
 .enc-level-row { display: flex; flex-direction: column; gap: 1px; padding: 3px 8px; border-radius: 5px; background: #ffffff06; border: 1px solid rgba(0,50,85,.4); flex: 1; justify-content: center; }
 .enc-lv-effect { font-family: Cinzel, serif; font-size: clamp(10.5px, 2.3vw, 13px) !important; color: #8ca; line-height: 1.25 !important; padding-left: 2px; }
@@ -146,9 +146,9 @@ canvas#c.hdr-mode {
 }
 .pause-equip-name {
   font-family: Cinzel, serif;
-  font-size: clamp(10px, 2.4vw, 13px) !important;
+  font-size: clamp(9px, 2.2vw, 12px) !important;
   color: #6ca;
-  white-space: normal !important;
+  white-space: nowrap !important;
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
@@ -349,7 +349,7 @@ Error generating stack: `+n.message+`
             <div class="hud-bar-val" id="xp-val">0 / 100</div>
           </div>
         </div>
-        <div id="lvl-lbl" style="display:inline-flex; align-items:center; gap:4px; margin-top:8px;"><span id="lvl-val-text">LVL 1</span><span id="lvl-dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#00ffaa; box-shadow:0 0 6px #00ffaa; margin-left:2px; vertical-align:middle; transition:background 0.2s, box-shadow 0.2s;"></span></div>
+        <div id="lvl-lbl" style="display:inline-flex; align-items:center; gap:4px; margin-top:8px; white-space:nowrap; flex-shrink:0;"><span id="lvl-val-text" style="white-space:nowrap;">LVL 1</span><span id="lvl-dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#00ffaa; box-shadow:0 0 6px #00ffaa; margin-left:2px; vertical-align:middle; flex-shrink:0; transition:background 0.2s, box-shadow 0.2s;"></span></div>
       </div>
       <div class="hud-badges-time-row">
         <div id="max-badges"></div>
@@ -755,7 +755,7 @@ function updateFpsDisplayState(){const f=document.getElementById("fps-lbl");if(f
       <div class="pause-equip-icon">${d.icon}</div>
       <div class="pause-equip-info">
         <div class="pause-equip-name" style="display:flex;justify-content:space-between;align-items:center;white-space:nowrap;${g?"color:#ffcc00;":""}">
-          <span color:#ffcc00;":""}">${d.name}${g?" ★":""}</span>
+          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;${g?"color:#ffcc00;":""}">${d.name}${g?"&nbsp;★":""}</span>
           <span style="font-size:clamp(9px,2.1vw,11px);color:#00ffaa;background:rgba(0,255,170,0.12);border:1px solid rgba(0,255,170,0.3);padding:1px 5px;border-radius:3px;font-family:'Cinzel',serif;margin-left:4px;flex-shrink:0;">Lv ${h}/${d.cap}</span>
         </div>
         <div class="pause-equip-stat">${v}</div>
@@ -987,5 +987,342 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
 })();const s=document.getElementById("btn-over-menu"),C=document.getElementById("btn-win-menu"),A=document.getElementById("start-screen"),D=document.getElementById("over-screen"),P=document.getElementById("win-screen");s&&A&&D&&(s.onclick=()=>{Xl(),D.classList.add("hidden"),A.classList.remove("hidden")}),C&&A&&P&&(C.onclick=()=>{Xl(),P.classList.add("hidden"),A.classList.remove("hidden")});const Y=document.getElementById("btn-reset-scores"),K=document.getElementById("reset-confirm"),le=document.getElementById("btn-reset-yes"),F=document.getElementById("btn-reset-no"),x=document.getElementById("btn-show-achievements"),ie=document.getElementById("btn-hide-achievements"),fe=document.getElementById("achievements-screen");x&&fe&&(x.onclick=()=>{Ih(),fe.classList.remove("hidden")}),ie&&fe&&(ie.onclick=()=>fe.classList.add("hidden")),Y&&K&&(Y.onclick=()=>K.style.display="flex"),F&&K&&(F.onclick=()=>K.style.display="none"),le&&K&&(le.onclick=()=>{localStorage.removeItem("galaxy_outlast_scores"),localStorage.removeItem("vamp_invaders_scores"),K.style.display="none";const q=document.getElementById("hi-val");q&&(q.textContent="0"),oo("score-table")})}catch(r){console.error("Failed to boot game",r)}},50)),()=>{Wv()}),[f]),P0.jsx("div",{ref:a,dangerouslySetInnerHTML:{__html:gv}})}vv.createRoot(document.getElementById("root")).render(P0.jsx(eo.StrictMode,{children:P0.jsx(lg,{})}));
 
 </script>
+
+<!-- HIGH REFRESH RATE V-SYNC & TOUCH KEEP-ALIVE OPTIMIZATION -->
+<script type="text/javascript">
+(function() {
+  function keepRefreshRateHigh() {}
+  window.addEventListener('touchend', keepRefreshRateHigh, { passive: true });
+  window.addEventListener('touchcancel', keepRefreshRateHigh, { passive: true });
+})();
+</script>
+
+<!-- DEVELOPER DIAGNOSTICS & LAG / STUTTER PROFILER OVERLAY -->
+<div id="dev-diag-panel" style="position:fixed;top:10px;right:10px;z-index:999999;background:rgba(2,11,22,0.92);border:1.5px solid #00ffaa;border-radius:10px;padding:10px 14px;color:#00ffaa;font-family:'Outfit',sans-serif;font-size:12px;box-shadow:0 0 15px rgba(0,255,170,0.3);width:270px;user-select:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
+  <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,255,170,0.25);padding-bottom:6px;margin-bottom:8px;cursor:pointer;" id="dev-header">
+    <span style="font-family:'Cinzel Decorative',serif;font-weight:700;font-size:13px;letter-spacing:1px;color:#00e5ff;">⚡ DEV DIAGNOSTICS</span>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <button id="dev-toggle-btn" style="background:#002233;border:1px solid #00ffaa;color:#00ffaa;border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer;">MINIMIZE</button>
+      <button id="dev-close-btn" style="background:#330011;border:1px solid #ff3366;color:#ff3366;border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer;font-weight:700;" title="Close Diagnostics Panel">✕</button>
+    </div>
+  </div>
+  
+  <div id="dev-body">
+    <!-- FPS & Compute Frame Time -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div style="background:rgba(0,30,50,0.6);padding:6px;border-radius:6px;border:1px solid rgba(0,255,170,0.15);">
+        <div style="font-size:9px;color:#6ca;text-transform:uppercase;">FPS</div>
+        <div id="dev-fps-val" style="font-size:18px;font-weight:700;color:#00ffaa;">60</div>
+      </div>
+      <div style="background:rgba(0,30,50,0.6);padding:6px;border-radius:6px;border:1px solid rgba(0,255,170,0.15);">
+        <div style="font-size:9px;color:#6ca;text-transform:uppercase;">FRAME COMPUTE</div>
+        <div id="dev-frametime-val" style="font-size:18px;font-weight:700;color:#00ffaa;">4.2 ms</div>
+      </div>
+    </div>
+
+    <!-- Inter-Frame Interval & RAM -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div style="background:rgba(0,30,50,0.6);padding:6px;border-radius:6px;border:1px solid rgba(0,255,170,0.15);">
+        <div style="font-size:9px;color:#6ca;text-transform:uppercase;">INTERVAL</div>
+        <div id="dev-interval-val" style="font-size:14px;font-weight:600;color:#00e5ff;">16.6 ms</div>
+      </div>
+      <div style="background:rgba(0,30,50,0.6);padding:6px;border-radius:6px;border:1px solid rgba(0,255,170,0.15);">
+        <div style="font-size:9px;color:#6ca;text-transform:uppercase;">RAM (HEAP)</div>
+        <div id="dev-ram-val" style="font-size:14px;font-weight:600;color:#00aaff;">N/A</div>
+      </div>
+    </div>
+
+    <!-- Lag Spikes & GC -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div style="background:rgba(0,30,50,0.6);padding:6px;border-radius:6px;border:1px solid rgba(0,255,170,0.15);">
+        <div style="font-size:9px;color:#6ca;text-transform:uppercase;">GAMEPLAY SPIKES</div>
+        <div id="dev-spikes-val" style="font-size:14px;font-weight:600;color:#ff3366;">0</div>
+      </div>
+      <div style="background:rgba(0,30,50,0.6);padding:6px;border-radius:6px;border:1px solid rgba(0,255,170,0.15);">
+        <div style="font-size:9px;color:#6ca;text-transform:uppercase;">GC PAUSES</div>
+        <div id="dev-gc-val" style="font-size:14px;font-weight:600;color:#cc66ff;">0</div>
+      </div>
+    </div>
+
+    <!-- Real-time Compute Time Sparkline Canvas Graph -->
+    <div style="margin-bottom:8px;">
+      <div style="font-size:9px;color:#6ca;text-transform:uppercase;margin-bottom:2px;">COMPUTE TIME SPARKLINE (MS)</div>
+      <canvas id="dev-sparkline-canvas" width="240" height="40" style="background:#000814;border:1px solid rgba(0,255,170,0.2);border-radius:4px;display:block;width:100%;height:40px;"></canvas>
+    </div>
+
+    <!-- Recent Lag Spikes Log with In-Game Time & Copy Report -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+        <span style="font-size:9px;color:#6ca;text-transform:uppercase;">GAMEPLAY STUTTER LOG</span>
+        <button id="dev-copy-report-btn" style="background:#003322;border:1px solid #00ffaa;color:#00ffaa;border-radius:3px;padding:1px 6px;font-size:9px;cursor:pointer;">COPY REPORT</button>
+      </div>
+      <div id="dev-stutter-log" style="font-size:9.5px;font-family:monospace;background:#00050f;padding:4px 6px;border-radius:4px;height:55px;overflow-y:auto;color:#ffaa00;border:1px solid rgba(255,170,0,0.2);white-space:nowrap;">
+        No active gameplay stutters.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+(function() {
+  let devMetrics = {
+    fps: 0,
+    computeTimeMs: 0,
+    intervalMs: 0,
+    stutterCount: 0,
+    stutterLog: [],
+    history: new Array(60).fill(4.0),
+    intervalHistory: new Array(30).fill(16.6),
+    lastTime: performance.now(),
+    heapUsedMB: "N/A",
+    lastHeap: 0,
+    gcPauses: 0,
+    maxComputeMs: 0,
+    avgComputeMs: 0,
+    totalComputeMs: 0,
+    memTimer: performance.now()
+  };
+
+  const elFps = document.getElementById("dev-fps-val");
+  const elFrameTime = document.getElementById("dev-frametime-val");
+  const elInterval = document.getElementById("dev-interval-val");
+  const elRam = document.getElementById("dev-ram-val");
+  const elSpikes = document.getElementById("dev-spikes-val");
+  const elGc = document.getElementById("dev-gc-val");
+  const elStutterLog = document.getElementById("dev-stutter-log");
+  const btnCopyReport = document.getElementById("dev-copy-report-btn");
+  const sparkCanvas = document.getElementById("dev-sparkline-canvas");
+  const sparkCtx = sparkCanvas ? sparkCanvas.getContext("2d") : null;
+
+  const toggleBtn = document.getElementById("dev-toggle-btn");
+  const devCloseBtn = document.getElementById("dev-close-btn");
+  const setDevDiagBtn = document.getElementById("set-dev-diag-btn");
+  const devDiagPanel = document.getElementById("dev-diag-panel");
+  const devBody = document.getElementById("dev-body");
+  const devHeader = document.getElementById("dev-header");
+  let isMinimized = false;
+  let isDevDiagEnabled = localStorage.getItem("galaxy_dev_diag") !== "off";
+
+  function updateDevDiagState(enabled) {
+    isDevDiagEnabled = enabled;
+    localStorage.setItem("galaxy_dev_diag", enabled ? "on" : "off");
+    if (devDiagPanel) devDiagPanel.style.display = enabled ? "block" : "none";
+    if (setDevDiagBtn) {
+      setDevDiagBtn.textContent = enabled ? "ON" : "OFF";
+      setDevDiagBtn.classList.toggle("on", enabled);
+    }
+  }
+
+  // Initialize Settings UI state
+  updateDevDiagState(isDevDiagEnabled);
+
+  if (setDevDiagBtn) {
+    setDevDiagBtn.onclick = (e) => {
+      e.stopPropagation();
+      updateDevDiagState(!isDevDiagEnabled);
+    };
+  }
+
+  if (devCloseBtn) {
+    devCloseBtn.onclick = (e) => {
+      e.stopPropagation();
+      updateDevDiagState(false);
+    };
+  }
+
+  if (toggleBtn && devBody && devHeader) {
+    const toggleFunc = (e) => {
+      e.stopPropagation();
+      isMinimized = !isMinimized;
+      devBody.style.display = isMinimized ? "none" : "block";
+      toggleBtn.textContent = isMinimized ? "EXPAND" : "MINIMIZE";
+    };
+    toggleBtn.onclick = toggleFunc;
+    devHeader.onclick = toggleFunc;
+  }
+
+  function isOverlayActive() {
+    const overlayIds = [
+      'up-screen', 'pause-screen', 'start-screen',
+      'over-screen', 'win-screen', 'settings-screen',
+      'achievements-screen', 'enc-screen', 'adv-sounds-screen', 'lore-screen'
+    ];
+    for (let i = 0; i < overlayIds.length; i++) {
+      const el = document.getElementById(overlayIds[i]);
+      if (el && !el.classList.contains('hidden')) {
+        const style = window.getComputedStyle(el);
+        if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  if (btnCopyReport) {
+    btnCopyReport.onclick = (e) => {
+      e.stopPropagation();
+      const reportLines = [
+        "=== GALAXY OUTLAST PERFORMANCE DIAGNOSTIC REPORT ===",
+        "Timestamp: " + new Date().toLocaleString(),
+        "Current FPS: " + devMetrics.fps,
+        "Current Frame Compute: " + devMetrics.computeTimeMs.toFixed(2) + " ms",
+        "Average Compute Time: " + devMetrics.avgComputeMs.toFixed(2) + " ms",
+        "Max Compute Time: " + devMetrics.maxComputeMs.toFixed(2) + " ms",
+        "Total Gameplay Spikes (24-500ms): " + devMetrics.stutterCount,
+        "GC Pauses Detected: " + devMetrics.gcPauses,
+        "RAM/Heap Usage: " + devMetrics.heapUsedMB,
+        "--- GAMEPLAY STUTTER LOG (IN-GAME TIMESTAMPS) ---",
+        ...(devMetrics.stutterLog.length ? devMetrics.stutterLog : ["No gameplay stutters recorded."])
+      ];
+      const reportText = reportLines.join("\n");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(reportText).then(() => {
+          btnCopyReport.textContent = "COPIED!";
+          setTimeout(() => { btnCopyReport.textContent = "COPY REPORT"; }, 1800);
+        }).catch(() => {
+          alert("DIAGNOSTIC REPORT:\n\n" + reportText);
+        });
+      } else {
+        alert("DIAGNOSTIC REPORT:\n\n" + reportText);
+      }
+    };
+  }
+
+  function drawSparkline() {
+    if (!sparkCtx || !sparkCanvas) return;
+    const w = sparkCanvas.width;
+    const h = sparkCanvas.height;
+    sparkCtx.clearRect(0, 0, w, h);
+
+    const warnY = h - (16.6 / 30) * h;
+    sparkCtx.strokeStyle = "rgba(255, 51, 102, 0.4)";
+    sparkCtx.setLineDash([2, 2]);
+    sparkCtx.beginPath();
+    sparkCtx.moveTo(0, warnY);
+    sparkCtx.lineTo(w, warnY);
+    sparkCtx.stroke();
+    sparkCtx.setLineDash([]);
+
+    const history = devMetrics.history;
+    const step = w / (history.length - 1);
+    sparkCtx.beginPath();
+    for (let i = 0; i < history.length; i++) {
+      const ms = Math.min(history[i], 30);
+      const x = i * step;
+      const y = Math.max(2, h - (ms / 30) * h);
+      if (i === 0) sparkCtx.moveTo(x, y);
+      else sparkCtx.lineTo(x, y);
+    }
+    sparkCtx.strokeStyle = "#00e5ff";
+    sparkCtx.lineWidth = 1.5;
+    sparkCtx.stroke();
+
+    sparkCtx.lineTo(w, h);
+    sparkCtx.lineTo(0, h);
+    sparkCtx.closePath();
+    const grad = sparkCtx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, "rgba(0, 229, 255, 0.3)");
+    grad.addColorStop(1, "rgba(0, 229, 255, 0.0)");
+    sparkCtx.fillStyle = grad;
+    sparkCtx.fill();
+  }
+
+  const originalRAF = window.requestAnimationFrame;
+  let lastFrameTime = performance.now();
+  let totalFramesOverall = 0;
+
+  window.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    lastFrameTime = performance.now();
+  });
+  window.addEventListener('focus', () => {
+    lastFrameTime = performance.now();
+  });
+
+  window.requestAnimationFrame = function(callback) {
+    return originalRAF.call(window, function(timestamp) {
+      const now = performance.now();
+      const interval = now - lastFrameTime;
+      lastFrameTime = now;
+
+      if (!isDevDiagEnabled || interval >= 500.0 || isOverlayActive()) {
+        callback(timestamp);
+        return;
+      }
+
+      devMetrics.intervalMs = interval;
+      devMetrics.intervalHistory.push(interval);
+      if (devMetrics.intervalHistory.length > 30) devMetrics.intervalHistory.shift();
+
+      const cbStart = performance.now();
+      callback(timestamp);
+      const cbEnd = performance.now();
+      const computeTime = (cbEnd - cbStart);
+
+      devMetrics.computeTimeMs = computeTime;
+      totalFramesOverall++;
+      devMetrics.totalComputeMs += computeTime;
+      devMetrics.avgComputeMs = devMetrics.totalComputeMs / totalFramesOverall;
+      if (computeTime > devMetrics.maxComputeMs) devMetrics.maxComputeMs = computeTime;
+
+      const inGameTimeEl = document.getElementById("time-lbl");
+      const inGameTime = inGameTimeEl ? inGameTimeEl.textContent.trim() : "0:00";
+
+      if ((interval > 24.0 || computeTime > 16.6) && interval < 500.0) {
+        devMetrics.stutterCount++;
+        const timeStr = new Date().toTimeString().split(" ")[0];
+        const logEntry = "[IG: " + inGameTime + " | " + timeStr + "] Compute: " + computeTime.toFixed(1) + "ms (Interval: " + interval.toFixed(1) + "ms)";
+        devMetrics.stutterLog.unshift(logEntry);
+        if (devMetrics.stutterLog.length > 12) devMetrics.stutterLog.pop();
+      }
+
+      devMetrics.history.push(computeTime);
+      if (devMetrics.history.length > 60) devMetrics.history.shift();
+
+      const sumIntervals = devMetrics.intervalHistory.reduce((a, b) => a + b, 0);
+      const avgInterval = sumIntervals / devMetrics.intervalHistory.length;
+      devMetrics.fps = avgInterval > 0 ? Math.round(1000 / avgInterval) : 60;
+
+      if (now - devMetrics.memTimer >= 1000) {
+        devMetrics.memTimer = now;
+        if (window.performance && window.performance.memory) {
+          const mem = window.performance.memory;
+          const usedMB = (mem.usedJSHeapSize / (1024 * 1024)).toFixed(1);
+          if (devMetrics.lastHeap > 0 && (devMetrics.lastHeap - usedMB) > 4) {
+            devMetrics.gcPauses++;
+          }
+          devMetrics.lastHeap = usedMB;
+          devMetrics.heapUsedMB = usedMB + " MB";
+        }
+      }
+
+      if (!isMinimized && isDevDiagEnabled) {
+        if (elFps) {
+          elFps.textContent = devMetrics.fps;
+          elFps.style.color = devMetrics.fps >= 55 ? "#00ffaa" : devMetrics.fps >= 30 ? "#ffaa00" : "#ff3366";
+        }
+        if (elFrameTime) {
+          elFrameTime.textContent = devMetrics.computeTimeMs.toFixed(1) + " ms";
+          elFrameTime.style.color = devMetrics.computeTimeMs <= 10 ? "#00ffaa" : devMetrics.computeTimeMs <= 16.6 ? "#00e5ff" : "#ff3366";
+        }
+        if (elInterval) {
+          elInterval.textContent = devMetrics.intervalMs.toFixed(1) + " ms";
+        }
+        if (elRam) elRam.textContent = devMetrics.heapUsedMB;
+        if (elSpikes) elSpikes.textContent = devMetrics.stutterCount;
+        if (elGc) elGc.textContent = devMetrics.gcPauses;
+
+        if (elStutterLog && devMetrics.stutterLog.length > 0) {
+          elStutterLog.innerHTML = devMetrics.stutterLog.join("<br/>");
+        }
+
+        drawSparkline();
+      }
+    });
+  };
+})();
+</script>
+
 </body>
 </html>

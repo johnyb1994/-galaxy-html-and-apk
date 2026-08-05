@@ -20,6 +20,30 @@ public class MainActivity extends BridgeActivity {
             webView.clearCache(true);
             webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         }
+
+        // Lock Display Refresh Rate to Highest Available (120Hz/144Hz/165Hz) to prevent 60Hz drops on touch release
+        try {
+            Window window = getWindow();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                android.view.Display display = getWindowManager().getDefaultDisplay();
+                android.view.Display.Mode[] modes = display.getSupportedModes();
+                android.view.Display.Mode maxMode = null;
+                float maxRefreshRate = 0;
+                for (android.view.Display.Mode mode : modes) {
+                    if (mode.getRefreshRate() > maxRefreshRate) {
+                        maxRefreshRate = mode.getRefreshRate();
+                        maxMode = mode;
+                    }
+                }
+                if (maxMode != null) {
+                    WindowManager.LayoutParams lp = window.getAttributes();
+                    lp.preferredDisplayModeId = maxMode.getModeId();
+                    window.setAttributes(lp);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
