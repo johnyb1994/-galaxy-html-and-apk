@@ -254,6 +254,14 @@ canvas#c.hdr-mode {
   padding: 2px 6px !important;
 }
 
+
+/* Zero-Stutter Hardware Acceleration & Reflow Prevention */
+#boss-warn, #hud, .modal-window, .settings-section, #up-screen, #pause-screen {
+  will-change: opacity, transform !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
 </style>
 </head>
   <body><div id="orientation-blocker" class="orientation-blocker"><div class="blocker-content"><div class="phone-icon">🔄</div><div class="blocker-title">PORTRAIT MODE REQUIRED</div><p class="blocker-text">Please rotate your device to portrait mode to play Galaxy Outlast.</p></div></div>
@@ -998,7 +1006,7 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
 </script>
 
 <!-- DEVELOPER DIAGNOSTICS & LAG / STUTTER PROFILER OVERLAY -->
-<div id="dev-diag-panel" style="position:fixed;top:10px;right:10px;z-index:999999;background:rgba(2,11,22,0.92);border:1.5px solid #00ffaa;border-radius:10px;padding:10px 14px;color:#00ffaa;font-family:'Outfit',sans-serif;font-size:12px;box-shadow:0 0 15px rgba(0,255,170,0.3);width:270px;user-select:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
+<div id="dev-diag-panel" style="position:fixed;top:10px;right:10px;z-index:999999;background:rgba(2,11,22,0.92);border:1.5px solid #00ffaa;border-radius:10px;padding:10px 14px;color:#00ffaa;font-family:'Outfit',sans-serif;font-size:12px;box-shadow:0 0 15px rgba(0,255,170,0.3);width:270px;user-select:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;">
   <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,255,170,0.25);padding-bottom:6px;margin-bottom:8px;cursor:pointer;" id="dev-header">
     <span style="font-family:'Cinzel Decorative',serif;font-weight:700;font-size:13px;letter-spacing:1px;color:#00e5ff;">⚡ DEV DIAGNOSTICS</span>
     <div style="display:flex;align-items:center;gap:6px;">
@@ -1101,7 +1109,9 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
   const devBody = document.getElementById("dev-body");
   const devHeader = document.getElementById("dev-header");
   let isMinimized = false;
-  let isDevDiagEnabled = localStorage.getItem("galaxy_dev_diag") !== "off";
+
+  let storedState = localStorage.getItem("galaxy_dev_diag");
+  let isDevDiagEnabled = storedState === "on";
 
   function updateDevDiagState(enabled) {
     isDevDiagEnabled = enabled;
@@ -1114,7 +1124,7 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
   }
 
   // Initialize Settings UI state
-  updateDevDiagState(isDevDiagEnabled);
+  setTimeout(() => updateDevDiagState(isDevDiagEnabled), 50);
 
   if (setDevDiagBtn) {
     setDevDiagBtn.onclick = (e) => {
