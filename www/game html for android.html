@@ -1706,38 +1706,49 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
   function addTrigger(type, detail) {
     var now = performance.now();
     triggerLog.push({ type: type, detail: detail, time: now });
-    if (triggerLog.length > 60) triggerLog.shift();
+    if (triggerLog.length > 80) triggerLog.shift();
   }
   function getRecentTriggers(msWindow) {
     var cutoff = performance.now() - (msWindow || 100);
-    var recent = [];
-    for (var i = triggerLog.length - 1; i >= 0; i--) {
+    var counts = {};
+    var order = [];
+    for (var i = 0; i < triggerLog.length; i++) {
       if (triggerLog[i].time >= cutoff) {
-        var ago = Math.round(performance.now() - triggerLog[i].time);
-        recent.unshift(triggerLog[i].type + "(" + triggerLog[i].detail + " " + ago + "ms)");
+        var key = triggerLog[i].detail ? (triggerLog[i].type + ":" + triggerLog[i].detail) : triggerLog[i].type;
+        if (!counts[key]) {
+          counts[key] = 1;
+          order.push(key);
+        } else {
+          counts[key]++;
+        }
       }
     }
-    return recent;
+    var batched = [];
+    for (var j = 0; j < order.length; j++) {
+      var k = order[j];
+      batched.push(counts[k] > 1 ? (k + "*" + counts[k]) : k);
+    }
+    return batched;
   }
   function getEntityStats() {
     try {
       var g = (window.w && window.w.G) ? window.w.G : window.G;
-      if (!g) return "Entities: N/A";
+      if (!g) return "B:0 E:0 P:0";
       var b = (g.bullets ? g.bullets.length : 0) + (g.playerBullets ? g.playerBullets.length : 0);
       var e = g.enemies ? g.enemies.length : 0;
       var p = g.parts ? g.parts.length : 0;
-      return "Bullets: " + b + " | Enemies: " + e + " | Particles: " + p;
-    } catch(err) { return "Entities: ?"; }
+      return "B:" + b + " E:" + e + " P:" + p;
+    } catch(err) { return "B:? E:? P:?"; }
   }
 
-  // HOOK KEY APIS & GAME FUNCTIONS
+  // HOOK KEY APIS & GAME FUNCTIONS (NO EMOJIS, BATCHED)
   (function installHooks() {
     try {
       // 1. Audio.play hook
       var origAudioPlay = HTMLAudioElement.prototype.play;
       HTMLAudioElement.prototype.play = function() {
-        var s = this.src ? this.src.split("/").pop().split("?")[0] : "audio";
-        addTrigger("🔊Audio.play", s);
+        var s = this.src ? this.src.split("/").pop().split("?")[0].replace(".mp3","").replace(".wav","") : "snd";
+        addTrigger("Aud", s);
         return origAudioPlay.apply(this, arguments);
       };
       // 2. AudioContext Oscillator hook
@@ -1745,22 +1756,22 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
       if (AC && AC.prototype.createOscillator) {
         var origOsc = AC.prototype.createOscillator;
         AC.prototype.createOscillator = function() {
-          addTrigger("🎵SoundSynth", "osc");
+          addTrigger("Synth", "osc");
           return origOsc.apply(this, arguments);
         };
       }
       // 3. localStorage.setItem hook
       var origStorage = localStorage.setItem;
       localStorage.setItem = function(k, v) {
-        if (k !== "galaxy_dev_diag") addTrigger("💾StorageWrite", k);
+        if (k !== "galaxy_dev_diag") addTrigger("Save", k);
         return origStorage.apply(this, arguments);
       };
-      // 4. Game function hooks (Ne, gl, Bv, ma, GC)
+      // 4. Game function hooks
       var checkGameHooks = setInterval(function() {
         if (typeof window.Ne === "function" && !window.Ne.__traced) {
           var _Ne = window.Ne;
           window.Ne = function(key, f, p, u) {
-            if (!window.Sl || !window.Sl[key]) addTrigger("🎨CanvasCacheMiss", key);
+            if (!window.Sl || !window.Sl[key]) addTrigger("CacheMiss", key);
             return _Ne.apply(this, arguments);
           };
           window.Ne.__traced = true;
@@ -1768,7 +1779,7 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
         if (typeof window.gl === "function" && !window.gl.__traced) {
           var _gl = window.gl;
           window.gl = function(boss) {
-            addTrigger("⚡BossChargeAttack", boss ? (boss.pat || "boss") : "boss");
+            addTrigger("BossCharge", boss ? (boss.pat || "atk") : "atk");
             return _gl.apply(this, arguments);
           };
           window.gl.__traced = true;
@@ -1776,7 +1787,7 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
         if (typeof window.Bv === "function" && !window.Bv.__traced) {
           var _Bv = window.Bv;
           window.Bv = function(w) {
-            addTrigger("👾BossSpawn", "Wave " + w);
+            addTrigger("BossSpawn", "W" + w);
             return _Bv.apply(this, arguments);
           };
           window.Bv.__traced = true;
@@ -1784,7 +1795,7 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
         if (typeof window.triggerWaveTransitionGC === "function" && !window.triggerWaveTransitionGC.__traced) {
           var _gc = window.triggerWaveTransitionGC;
           window.triggerWaveTransitionGC = function() {
-            addTrigger("🧹WaveGC", "triggerWaveTransitionGC");
+            addTrigger("WaveGC", "gc");
             return _gc.apply(this, arguments);
           };
           window.triggerWaveTransitionGC.__traced = true;
@@ -1801,112 +1812,52 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
   function refreshOverlayCache() {
     if (!overlayEls) overlayEls = overlayIds.map(function(id){ return document.getElementById(id); });
     for (var i = 0; i < overlayEls.length; i++) {
-      var el = overlayEls[i];
-      if (el && !el.classList.contains("hidden")) {
-        var s = window.getComputedStyle(el);
-        if (s.display !== "none" && s.visibility !== "hidden" && s.opacity !== "0") {
-          cachedOverlayActive = true; return;
-        }
-      }
+      if (overlayEls[i] && overlayEls[i].classList.contains("active")) return true;
     }
-    cachedOverlayActive = false;
+    return false;
+  }
+  function isAnyOverlayActive() {
+    var now = performance.now();
+    if (now - lastOverlayCheck >= 200) {
+      lastOverlayCheck = now;
+      cachedOverlayActive = refreshOverlayCache();
+    }
+    return cachedOverlayActive;
   }
 
-  var originalRAF = window.requestAnimationFrame;
-  var monitoredRAF = null;
-  var storedState = localStorage.getItem("galaxy_dev_diag");
-  var isDevDiagEnabled = storedState === "on";
+  function monitorRAF(origRAF) {
+    var elFps = null, elSpikes = null, elTime = null, elWave = null, elBoss = null;
+    function cacheGameEls() {
+      if (!elFps) elFps = document.getElementById("diag-fps-val");
+      if (!elSpikes) elSpikes = document.getElementById("diag-stutter-val");
+      if (!elTime) elTime = document.getElementById("time-lbl");
+      if (!elWave) elWave = document.getElementById("wave-lbl");
+      if (!elBoss) elBoss = document.getElementById("boss-warn");
+    }
 
-  function updateDevDiagState(enabled) {
-    isDevDiagEnabled = enabled;
-    localStorage.setItem("galaxy_dev_diag", enabled ? "on" : "off");
-    if (devPanel) devPanel.style.display = enabled ? "block" : "none";
-    var btn = document.getElementById("set-dev-diag-btn");
-    if (btn) { btn.textContent = enabled ? "ON" : "OFF"; btn.classList.toggle("on", enabled); }
-    window.requestAnimationFrame = enabled ? getMonitoredRAF() : originalRAF;
-  }
+    var hist = new Float32Array(HIST);
+    var hIdx = 0, lastTs = 0;
+    var _gpuCanvas = document.createElement("canvas");
+    _gpuCanvas.width = 1; _gpuCanvas.height = 1;
+    var _gpuCtx = _gpuCanvas.getContext("2d", { willReadFrequently: false });
 
-  // GPU KEEP-ALIVE HEARTBEAT — prevents Android DVFS from downclocking GPU
-  // between frames when JS compute is very low (< 2ms). A minimal 1x1 draw
-  // each frame keeps the GPU power state active on 60Hz and 120Hz devices.
-  var _gpuCtx = null;
-  (function() {
-    try {
-      if (typeof OffscreenCanvas !== 'undefined') {
-        var oc = new OffscreenCanvas(1, 1);
-        _gpuCtx = oc.getContext('2d');
-      } else {
-        var hc = document.createElement('canvas');
-        hc.width = 1; hc.height = 1;
-        hc.style.cssText = 'position:fixed;left:-2px;top:-2px;width:1px;height:1px;opacity:0;pointer-events:none;';
-        document.body.appendChild(hc);
-        _gpuCtx = hc.getContext('2d');
-      }
-    } catch(e) { _gpuCtx = null; }
-  })();
+    function monitoredRAF(cb) {
+      return origRAF(function(ts) {
+        if (!isDevDiagEnabled) return cb(ts);
+        if (isAnyOverlayActive()) {
+          lastTs = ts;
+          return cb(ts);
+        }
 
-  function getMonitoredRAF() {
-    if (monitoredRAF) return monitoredRAF;
-    var lastFrameTime = performance.now();
-    var pauseFrames = 0;
-    var postCalSkip = 0;   // frames to skip after calibration to flush warmup intervals
-    var HIST = 60;
-    var hist = new Array(HIST).fill(16.6);
-    var hIdx = 0;
-    m.intervalSum = 16.6 * HIST;
-    m.memTimer = performance.now();
-
-    window.addEventListener("visibilitychange", function() {
-      if (!document.hidden) { lastFrameTime = performance.now(); pauseFrames = 10; }
-    });
-    window.addEventListener("focus", function() {
-      lastFrameTime = performance.now(); pauseFrames = 6;
-    });
-
-    monitoredRAF = function(cb) {
-      return originalRAF.call(window, function(ts) {
         var now = performance.now();
-        var iv = now - lastFrameTime;
-        lastFrameTime = now;
-
-        if (iv > 150) { pauseFrames = 10; cb(ts); return; }
-        if (pauseFrames > 0) { pauseFrames--; cb(ts); return; }
-
-        if (now - lastOverlayCheck >= 500) {
-          lastOverlayCheck = now;
-          refreshOverlayCache();
-        }
-        if (cachedOverlayActive) { cb(ts); return; }
-
-        if (m.calibrating) {
-          m.calFrames++;
-          m.calSum += iv;
-          if (m.calFrames >= 60) {
-            m.detectedRefreshMs = m.calSum / m.calFrames;
-            m.calibrating = false;
-            // Reset history fully with calibrated value — flushes any fast warmup intervals
-            for (var i = 0; i < HIST; i++) hist[i] = m.detectedRefreshMs;
-            m.intervalSum = m.detectedRefreshMs * HIST;
-            hIdx = 0;
-            // Skip 30 more frames so the rolling window fills with real gameplay
-            // intervals, not browser-startup fast-fire callbacks. Works for both
-            // 60Hz (16.6ms) and 120Hz (8.33ms) modes.
-            postCalSkip = 30;
-          }
-          cb(ts); return;
-        }
-
-        // Post-calibration warmup skip
-        if (postCalSkip > 0) { postCalSkip--; cb(ts); return; }
+        var iv = lastTs > 0 ? (ts - lastTs) : m.detectedRefreshMs;
+        lastTs = ts;
 
         var old = hist[hIdx];
         hist[hIdx] = iv;
         hIdx = (hIdx + 1) % HIST;
         m.intervalSum = m.intervalSum - old + iv;
         var avg = m.intervalSum / HIST;
-        // Clamp FPS to the detected refresh rate (+10% tolerance for jitter).
-        // Prevents showing 157 FPS on a 60/120Hz device when warmup frames
-        // or tab-focus events inject fast intervals into the rolling window.
         var maxFps = Math.round(1000 / m.detectedRefreshMs * 1.1);
         m.fps = avg > 0 ? Math.min(Math.round(1000 / avg), maxFps) : 60;
 
@@ -1914,9 +1865,6 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
         cb(ts);
         var compute = performance.now() - t0;
 
-        // GPU HEARTBEAT: submit a tiny 1x1 draw immediately after the game frame.
-        // This keeps the Android GPU power governor from downclocking the GPU
-        // between frames when JS compute is < 2ms. No visual effect.
         if (_gpuCtx) { try { _gpuCtx.fillRect(0, 0, 1, 1); } catch(e) {} }
 
         m.totalFrames++;
@@ -1932,23 +1880,16 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
           m.stutterCount++;
           cacheGameEls();
           var ig = elTime ? elTime.textContent.trim() : "?:??";
-          var wt = elWave ? elWave.textContent.trim().split("\n").join(" ") : "WAVE?";
-          var ba = elBoss && elBoss.classList.contains("show") ? "YES" : "NO";
-          var ts2 = new Date().toTimeString().split(" ")[0];
-          var cause = isCpu ? "\uD83D\uDD34 CPU BOTTLENECK" : "\uD83D\uDFE1 V-SYNC DROP";
+          var wt = elWave ? elWave.textContent.trim().split("\n").join("") : "W?";
+          var ba = elBoss && elBoss.classList.contains("show") ? "1" : "0";
+          var cause = isCpu ? "CPU" : "VSync";
           if (isCpu) m.causeStats.cpu++; else m.causeStats.vsync++;
           var ent = getEntityStats();
-          var rec = getRecentTriggers(500);
-          var trigStr = rec.length ? rec.join(" | ") : "None (Idle OS/GPU DVFS Throttling)";
-          var full = cause + " [IG: " + ig + " | " + ts2 + "]"
-            + " Compute: " + compute.toFixed(2) + "ms"
-            + " | Interval: " + iv.toFixed(2) + "ms"
-            + " | Baseline: " + m.detectedRefreshMs.toFixed(1) + "ms"
-            + " | " + wt + " | Boss: " + ba + " | RAM: " + m.heapUsedMB
-            + " | " + ent
-            + " | Triggers (500ms): " + trigStr;
+          var rec = getRecentTriggers(100);
+          var trigStr = rec.length ? rec.join(",") : "None";
+          var full = cause + "[" + ig + "] C:" + compute.toFixed(1) + "ms I:" + iv.toFixed(1) + "ms | " + wt + " B:" + ba + " RAM:" + m.heapUsedMB + " | " + ent + " | T(100ms):" + trigStr;
           m.stutterLog.unshift({ full: full });
-          if (m.stutterLog.length > 100) m.stutterLog.pop();
+          if (m.stutterLog.length > 40) m.stutterLog.pop();
         }
 
         if (now - m.memTimer >= 1000) {
@@ -1958,7 +1899,7 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
               var mb = (window.performance.memory.usedJSHeapSize / 1048576).toFixed(1);
               if (m.lastHeap > 0 && (m.lastHeap - mb) > 3.5) { m.gcPauses++; m.causeStats.gc++; }
               m.lastHeap = mb;
-              m.heapUsedMB = mb + " MB";
+              m.heapUsedMB = mb + "MB";
             }
           } catch(e) {}
         }
@@ -1983,8 +1924,8 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
       row.id = "set-dev-diag-row";
       row.className = "settings-row";
       row.style.cssText = "padding:10px 0;border-bottom:1px solid rgba(0,50,80,.3);";
-      row.innerHTML = "<span class=\"settings-label\" style=\"font-family:Cinzel,serif;font-size:clamp(15px,3.2vw,17px);color:#6ca;\">\u26A1 Dev Diagnostics</span>"
-        + "<button class=\"toggle-btn " + (isDevDiagEnabled ? "on" : "") + "\" id=\"set-dev-diag-btn\" style=\"font-family:Cinzel,serif;font-size:clamp(13px,3vw,16px);border-radius:14px;padding:6px 16px;cursor:pointer;border:1px solid #035;background:#000a1499;color:#468;letter-spacing:1px;\">" + (isDevDiagEnabled ? "ON" : "OFF") + "</button>";
+      row.innerHTML = '<span class="settings-label" style="font-family:Cinzel,serif;font-size:clamp(15px,3.2vw,17px);color:#6ca;">Dev Diagnostics</span>'
+        + '<button class="toggle-btn ' + (isDevDiagEnabled ? 'on' : '') + '" id="set-dev-diag-btn" style="font-family:Cinzel,serif;font-size:clamp(13px,3vw,16px);border-radius:14px;padding:6px 16px;cursor:pointer;border:1px solid #035;background:#000a1499;color:#468;letter-spacing:1px;">' + (isDevDiagEnabled ? 'ON' : 'OFF') + '</button>';
       if (bb && bb.parentNode) bb.parentNode.insertBefore(row, bb);
       else sm.appendChild(row);
       var btn = document.getElementById("set-dev-diag-btn");
@@ -2022,51 +1963,28 @@ at.addEventListener("touchcancel",_onTouchEnd,{passive:true});function cl(L){con
     btnCopy.onclick = function(e) {
       e.stopPropagation();
       cacheGameEls();
-      var res = window.innerWidth + "x" + window.innerHeight + " @ " + (window.devicePixelRatio || 1) + "x DPR";
-      var wav = elWave ? elWave.textContent.trim().split("\n").join(" ") : "N/A";
-      var bss = elBoss && elBoss.classList.contains("show") ? "YES" : "NO";
+      var wav = elWave ? elWave.textContent.trim().split("\n").join("") : "W?";
+      var bss = elBoss && elBoss.classList.contains("show") ? "1" : "0";
       var tot = m.stutterCount;
       var den = tot || 1;
-      var thr = (m.detectedRefreshMs * 1.55).toFixed(1);
+      var hz = Math.round(1000 / (m.detectedRefreshMs || 16.6));
+      var trig = getRecentTriggers(100);
+      var trigStr = trig.length ? trig.join(",") : "None";
       var lines = [
-        "==================================================",
-        " GALAXY OUTLAST DEEP ANALYTICAL DIAGNOSTIC REPORT",
-        "==================================================",
-        "Timestamp: " + new Date().toLocaleString(),
-        "User Agent: " + navigator.userAgent,
-        "Screen Resolution: " + res,
-        "Orientation: " + (window.innerWidth > window.innerHeight ? "LANDSCAPE" : "PORTRAIT"),
-        "Detected Display Refresh: " + m.detectedRefreshMs.toFixed(1) + "ms (" + Math.round(1000/m.detectedRefreshMs) + "Hz)",
-        "Current Wave: " + wav,
-        "Boss Active: " + bss,
-        "",
-        "--- PERFORMANCE SUMMARY METRICS ---",
-        "Current FPS: " + m.fps,
-        "Avg Frame Compute Time: " + m.avgComputeMs.toFixed(2) + " ms",
-        "Peak Frame Compute Time: " + m.maxComputeMs.toFixed(2) + " ms",
-        "Total Gameplay Spikes Recorded: " + tot,
-        "Spike Threshold Used: " + thr + "ms",
-        "GC Pauses Detected: " + m.gcPauses,
-        "RAM/Heap Memory Used: " + m.heapUsedMB,
-        "",
-        "--- AUTOMATED ROOT CAUSE CLASSIFICATION ---",
-        "\u2022 V-Sync Drops (>" + (m.detectedRefreshMs * 1.55).toFixed(0) + "ms interval): " + m.causeStats.vsync + " (" + ((m.causeStats.vsync/den)*100).toFixed(1) + "%)",
-        "\u2022 CPU Code Bottlenecks (>16.6ms compute): " + m.causeStats.cpu + " (" + ((m.causeStats.cpu/den)*100).toFixed(1) + "%)",
-        "\u2022 Garbage Collection Drops: " + m.causeStats.gc + " (" + ((m.causeStats.gc/den)*100).toFixed(1) + "%)",
-        "",
-        "--- DETAILED STUTTER LOG (ALL " + m.stutterLog.length + " ENTRIES) ---"
+        "[DIAG] " + hz + "Hz(" + m.detectedRefreshMs.toFixed(1) + "ms) FPS:" + m.fps + " C:avg " + m.avgComputeMs.toFixed(1) + "ms,max " + m.maxComputeMs.toFixed(1) + "ms | Spikes:" + tot + " | GC:" + m.gcPauses + " | RAM:" + m.heapUsedMB + " | " + wav + " B:" + bss,
+        "Causes: VSync:" + m.causeStats.vsync + "(" + ((m.causeStats.vsync/den)*100).toFixed(0) + "%) CPU:" + m.causeStats.cpu + "(" + ((m.causeStats.cpu/den)*100).toFixed(0) + "%) GC:" + m.causeStats.gc + "(" + ((m.causeStats.gc/den)*100).toFixed(0) + "%)",
+        "Triggers(100ms): " + trigStr,
+        "Logs(" + m.stutterLog.length + "):"
       ];
       for (var i = 0; i < m.stutterLog.length; i++) {
         lines.push("[" + (i+1) + "] " + (typeof m.stutterLog[i] === "string" ? m.stutterLog[i] : m.stutterLog[i].full));
       }
-      if (!m.stutterLog.length) lines.push("No stutters recorded.");
-      lines.push("==================================================");
+      if (!m.stutterLog.length) lines.push("No stutters");
       copyText(lines.join("\n"));
     };
   }
 
   updateDevDiagState(isDevDiagEnabled);
-})();
-</script>
+})();</script>
 </body>
 </html>
