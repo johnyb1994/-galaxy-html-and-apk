@@ -73,26 +73,49 @@ public class MainActivity extends BridgeActivity {
             webView.getSettings().setDatabaseEnabled(true);
         }
 
-        // Lock Display Refresh Rate to Highest Available (120Hz/144Hz/165Hz) to prevent 60Hz drops on touch release
+        // Enable Maximum Display Refresh Rate (e.g. 90Hz, 120Hz, 144Hz) for ultra-smooth rendering
         try {
             Window window = getWindow();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            WindowManager.LayoutParams lp = window.getAttributes();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 android.view.Display display = getWindowManager().getDefaultDisplay();
                 android.view.Display.Mode[] modes = display.getSupportedModes();
                 android.view.Display.Mode maxMode = null;
-                float maxRefreshRate = 0;
+                float maxHz = 0.0f;
+
+                android.view.Display.Mode currentMode = display.getMode();
+                int curWidth = currentMode != null ? currentMode.getPhysicalWidth() : 0;
+                int curHeight = currentMode != null ? currentMode.getPhysicalHeight() : 0;
+
                 for (android.view.Display.Mode mode : modes) {
-                    if (mode.getRefreshRate() > maxRefreshRate) {
-                        maxRefreshRate = mode.getRefreshRate();
-                        maxMode = mode;
+                    // Match current resolution with highest available refresh rate
+                    if (mode.getPhysicalWidth() == curWidth && mode.getPhysicalHeight() == curHeight) {
+                        if (mode.getRefreshRate() > maxHz) {
+                            maxHz = mode.getRefreshRate();
+                            maxMode = mode;
+                        }
                     }
                 }
+
+                // Fallback to highest refresh rate mode overall if resolution match was not found
+                if (maxMode == null) {
+                    for (android.view.Display.Mode mode : modes) {
+                        if (mode.getRefreshRate() > maxHz) {
+                            maxHz = mode.getRefreshRate();
+                            maxMode = mode;
+                        }
+                    }
+                }
+
                 if (maxMode != null) {
-                    WindowManager.LayoutParams lp = window.getAttributes();
                     lp.preferredDisplayModeId = maxMode.getModeId();
-                    window.setAttributes(lp);
+                    lp.preferredRefreshRate = maxHz;
                 }
             }
+
+            // Apply window attributes with maximum refresh rate
+            window.setAttributes(lp);
         } catch (Exception e) {
             e.printStackTrace();
         }

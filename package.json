@@ -1,6 +1,6 @@
 {
   "name": "galaxy-outlast",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Galaxy Outlast Mobile Game",
   "main": "index.js",
   "scripts": {
