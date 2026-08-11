@@ -129,6 +129,33 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (this.bridge != null && this.bridge.getWebView() != null) {
+            this.bridge.getWebView().evaluateJavascript("window._onAppMinimize && window._onAppMinimize();", null);
+            this.bridge.getWebView().onPause();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (this.bridge != null && this.bridge.getWebView() != null) {
+            this.bridge.getWebView().onResume();
+            this.bridge.getWebView().evaluateJavascript("window._onAppResume && window._onAppResume();", null);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (this.bridge != null && this.bridge.getWebView() != null) {
+            this.bridge.getWebView().evaluateJavascript("window._onAppMinimize && window._onAppMinimize();", null);
+            this.bridge.getWebView().onPause();
+        }
+    }
+
     private void hideSystemUI() {
         Window window = getWindow();
         WindowCompat.setDecorFitsSystemWindows(window, false);
