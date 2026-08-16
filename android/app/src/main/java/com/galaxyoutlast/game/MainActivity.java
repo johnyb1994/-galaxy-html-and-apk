@@ -28,14 +28,11 @@ public class MainActivity extends BridgeActivity {
             e.printStackTrace();
         }
 
-        // 2. Window 32-bit RGBA hardware buffer format & Sustained Performance Mode
+        // 2. Window 32-bit RGBA hardware buffer format & Keep Screen On
         try {
             Window window = getWindow();
             window.setFormat(PixelFormat.RGBA_8888);
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                window.setSustainedPerformanceMode(true);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,79 +42,16 @@ public class MainActivity extends BridgeActivity {
             webView.clearCache(true);
             webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
             
-            // 3. Explicit Hardware Acceleration layer on WebView
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-
-            // 4. Opaque Black background to skip SurfaceFlinger alpha blending
+            // 3. Opaque Black background to skip SurfaceFlinger alpha blending
             webView.setBackgroundColor(Color.BLACK);
 
-            // 5. Disable Android UI overscroll & scrollbar composite passes
+            // 4. Disable Android UI overscroll & scrollbar composite passes
             webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
             webView.setVerticalScrollBarEnabled(false);
             webView.setHorizontalScrollBarEnabled(false);
             
-            // 6. High render priority and storage acceleration
-            try {
-                webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                try {
-                    webView.getSettings().setOffscreenPreRaster(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
             webView.getSettings().setDomStorageEnabled(true);
             webView.getSettings().setDatabaseEnabled(true);
-        }
-
-        // Enable Maximum Display Refresh Rate (e.g. 90Hz, 120Hz, 144Hz) for ultra-smooth rendering
-        try {
-            Window window = getWindow();
-            WindowManager.LayoutParams lp = window.getAttributes();
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                android.view.Display display = getWindowManager().getDefaultDisplay();
-                android.view.Display.Mode[] modes = display.getSupportedModes();
-                android.view.Display.Mode maxMode = null;
-                float maxHz = 0.0f;
-
-                android.view.Display.Mode currentMode = display.getMode();
-                int curWidth = currentMode != null ? currentMode.getPhysicalWidth() : 0;
-                int curHeight = currentMode != null ? currentMode.getPhysicalHeight() : 0;
-
-                for (android.view.Display.Mode mode : modes) {
-                    // Match current resolution with highest available refresh rate
-                    if (mode.getPhysicalWidth() == curWidth && mode.getPhysicalHeight() == curHeight) {
-                        if (mode.getRefreshRate() > maxHz) {
-                            maxHz = mode.getRefreshRate();
-                            maxMode = mode;
-                        }
-                    }
-                }
-
-                // Fallback to highest refresh rate mode overall if resolution match was not found
-                if (maxMode == null) {
-                    for (android.view.Display.Mode mode : modes) {
-                        if (mode.getRefreshRate() > maxHz) {
-                            maxHz = mode.getRefreshRate();
-                            maxMode = mode;
-                        }
-                    }
-                }
-
-                if (maxMode != null) {
-                    lp.preferredDisplayModeId = maxMode.getModeId();
-                    lp.preferredRefreshRate = maxHz;
-                }
-            }
-
-            // Apply window attributes with maximum refresh rate
-            window.setAttributes(lp);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
