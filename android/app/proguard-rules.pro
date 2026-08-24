@@ -19,3 +19,13 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Capacitor bridge & plugins (reflection-heavy)
+-keep class com.getcapacitor.** { *; }
+-keepclassmembers class * {
+    @com.getcapacitor.PluginMethod *;
+}
+-keep class org.apache.cordova.** { *; }
+
+# Application classes referenced from JS bridge / manifest
+-keep class com.galaxyoutlast.game.** { *; }
