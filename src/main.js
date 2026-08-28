@@ -67,12 +67,13 @@ import {
   fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu
 } from './game/audio.js';
 import {
-  GAME_CONSTANTS, K0, Gh, Sv, ce, Mv, Te, Rh, getModeHighScore, getModeDamagelessHighScore,
-  Hh, Tv, _v, et, w, Z0, scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab,
-  Lh, xs, SCORE_TABLE_HEADER, oo, Fv,
-  qh, N0, Xh, kh, Av, wv, zv, Bv, ma, ct, Ov, Lv, gl, jt, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, _bsc, _asc
+  GAME_CONSTANTS, ce, Te, w, et, Gh, Mv, Rh, getModeHighScore, getModeDamagelessHighScore,
+  Tv, _v, triggerWaveTransitionGC, prewarmGraphics, updateFpsDisplayState, K0,
+  qh, N0, Xh, kh, Av, wv, zv, Bv, ma, ct, Ov, Lv, gl, jt, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv,
+  _bsc, _asc, Z0, Kv, H0, scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab,
+  Lh, xs, SCORE_TABLE_HEADER, oo, Fv
 } from './game/state.js';
-import { _pb, so, Qh, Jv } from './game/render.js';
+import { _pb, ao, Ln, hu, io, so, Qh, Jv } from './game/render.js';
 import './game/diagnostics.js';
 
 // 4. React Runtime & UI Markup

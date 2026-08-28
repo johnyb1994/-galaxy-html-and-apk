@@ -203,21 +203,21 @@ function scoreKey(){return et&&et.bossMode?"galaxy_outlast_scores_boss":et&&et.i
     </div>`}).join("")}
 
 window.GAME_CONSTANTS = GAME_CONSTANTS;
-window.K0 = K0;
-window.et = et;
+window.ce = ce;
+window.Te = Te;
 window.w = w;
-window.Z0 = Z0;
-window.loadScores = loadScores;
-window.Lh = Lh;
-window.xs = xs;
-window.Fv = Fv;
-window.oo = oo;
-window.setScoreTab = setScoreTab;
-window.updateDamageless = updateDamageless;
-window.scoreKey = scoreKey;
-window.runScoreKey = runScoreKey;
-window.SCORE_TABLE_HEADER = SCORE_TABLE_HEADER;
-
+window.et = et;
+window.Gh = Gh;
+window.Mv = Mv;
+window.Rh = Rh;
+window.getModeHighScore = getModeHighScore;
+window.getModeDamagelessHighScore = getModeDamagelessHighScore;
+window.Tv = Tv;
+window._v = _v;
+window.triggerWaveTransitionGC = triggerWaveTransitionGC;
+window.prewarmGraphics = prewarmGraphics;
+window.updateFpsDisplayState = updateFpsDisplayState;
+window.K0 = K0;
 window.qh = qh;
 window.N0 = N0;
 window.Xh = Xh;
@@ -242,34 +242,37 @@ window.Uv = Uv;
 window.Nv = Nv;
 window._bsc = _bsc;
 window._asc = _asc;
+window.Z0 = Z0;
+window.Kv = Kv;
+window.H0 = H0;
+window.scoreKey = scoreKey;
+window.runScoreKey = runScoreKey;
+window.loadScores = loadScores;
+window.updateDamageless = updateDamageless;
+window.setScoreTab = setScoreTab;
+window.Lh = Lh;
+window.xs = xs;
+window.SCORE_TABLE_HEADER = SCORE_TABLE_HEADER;
+window.oo = oo;
+window.Fv = Fv;
 
 export {
   GAME_CONSTANTS,
-  K0,
-  Gh,
-  Sv,
   ce,
-  Mv,
   Te,
+  w,
+  et,
+  Gh,
+  Mv,
   Rh,
   getModeHighScore,
   getModeDamagelessHighScore,
-  Hh,
   Tv,
   _v,
-  et,
-  w,
-  Z0,
-  scoreKey,
-  runScoreKey,
-  loadScores,
-  updateDamageless,
-  setScoreTab,
-  Lh,
-  xs,
-  SCORE_TABLE_HEADER,
-  oo,
-  Fv,
+  triggerWaveTransitionGC,
+  prewarmGraphics,
+  updateFpsDisplayState,
+  K0,
   qh,
   N0,
   Xh,
@@ -293,5 +296,18 @@ export {
   Uv,
   Nv,
   _bsc,
-  _asc
+  _asc,
+  Z0,
+  Kv,
+  H0,
+  scoreKey,
+  runScoreKey,
+  loadScores,
+  updateDamageless,
+  setScoreTab,
+  Lh,
+  xs,
+  SCORE_TABLE_HEADER,
+  oo,
+  Fv
 };
