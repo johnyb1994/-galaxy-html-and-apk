@@ -755,5 +755,64 @@ window.addEventListener("pageshow",function(ev){if(ev&&ev.persisted)_handleAppRe
 window.addEventListener("blur",()=>{if(document.hidden)_handleAppMinimize();});
 }
 
-// 6. Mount React Component to DOM Root
-vv.createRoot(document.getElementById("root")).render(P0.jsx(eo.StrictMode,{children:P0.jsx(lg,{})}));
+// 6. React Root Component (lg) & DOM Mount
+function lg(){const a=eo.useRef(null),[f,p]=eo.useState(!1);return eo.useEffect(()=>(window.__bootStage="effect-run",a.current&&!f&&(p(!0),function(){try{(!localStorage.getItem("galaxy_outlast_settings")&&localStorage.getItem("vi_settings")&&localStorage.setItem("galaxy_outlast_settings",localStorage.getItem("vi_settings")),["vamp_invaders_scores","vamp_invaders_skin","vamp_invaders_achievements","vamp_invaders_lore_seen","galaxy_outlast_scores","galaxy_outlast_skin","galaxy_outlast_achievements","galaxy_outlast_lore_seen"].forEach(r=>{const d=localStorage.getItem(r);if(d!==null){const h=r.replace("vamp_invaders_","galaxy_outlast_");if(!localStorage.getItem(h)){let g=d;if(r==="vamp_invaders_achievements"||r==="galaxy_outlast_achievements")try{const v=JSON.parse(d);(v.first_blood||v.first_strike)&&(v.first_strike=!0,delete v.first_blood),(v.blood_drinker||v.energy_harvester)&&(v.energy_harvester=!0,delete v.blood_drinker),g=JSON.stringify(v)}catch{}r.endsWith("skin")&&(d==="first_blood"&&(g="first_strike"),d==="blood_drinker"&&(g="energy_harvester")),localStorage.setItem(h,g)}}}))}catch(e){console.warn("Settings migration skipped",e)}}(),w.bootTimer=setTimeout(()=>{try{window.__bootStage="boot-cb-start";xv(pl,al,ha),window.__bootStage="xv-called",Xl();const r=document.getElementById("btn-show-settings"),d=document.getElementById("settings-screen");r&&d&&(r.onclick=()=>{updateInsanitySettingUI();d.classList.remove("hidden");const devBtn=document.getElementById("set-dev-diag-btn");if(devBtn){const on=localStorage.getItem("galaxy_dev_diag")!=="off";devBtn.textContent=on?"ON":"OFF";devBtn.classList.toggle("on",on)}});const h=document.getElementById("btn-hide-settings"),hTop=document.getElementById("btn-hide-settings-top");h&&d&&(h.onclick=()=>d.classList.add("hidden"));hTop&&d&&(hTop.onclick=()=>d.classList.add("hidden"));const g=document.getElementById("btn-pause-settings");g&&d&&(g.onclick=()=>{updateInsanitySettingUI();d.classList.remove("hidden")});const v=document.getElementById("btn-show-scores"),c=document.getElementById("score-screen");v&&c&&(v.onclick=()=>{setScoreTab(et&&et.insanity?"insanity":et&&et.bossMode?"boss":"normal");c.classList.remove("hidden")});const y=document.getElementById("btn-hide-scores");y&&c&&(y.onclick=()=>c.classList.add("hidden"));const t1=document.getElementById("tab-scores-normal"),t2=document.getElementById("tab-scores-insanity"),t3=document.getElementById("tab-scores-damageless"),tb=document.getElementById("tab-scores-boss");t1&&(t1.onclick=()=>setScoreTab("normal"));t2&&(t2.onclick=()=>setScoreTab("insanity"));t3&&(t3.onclick=()=>setScoreTab("damageless"));tb&&(tb.onclick=()=>setScoreTab("boss"));const S=document.getElementById("btn-show-lore"),T=document.getElementById("lore-screen");S&&T&&(S.onclick=()=>T.classList.remove("hidden"));const M=document.getElementById("btn-lore-back");M&&T&&(M.onclick=()=>T.classList.add("hidden")),(function(){try{localStorage.getItem("galaxy_outlast_lore_seen")||localStorage.setItem("galaxy_outlast_lore_seen","1")}catch(e){}})(),eg();const E=document.getElementById("slide-sfx-volume"),H=document.getElementById("val-sfx-volume");if(E&&H){const q=et.sfxVolume!==void 0?et.sfxVolume:.5;E.value=Math.round(q*100).toString(),H.textContent=Math.round(q*100)+"%";const $=ee=>{H.textContent=ee+"%",Ph(ee/100)};E.oninput=()=>{$(parseInt(E.value)||0)},E.onchange=()=>{$(parseInt(E.value)||0)}}const Q=document.getElementById("btn-configure-sound"),G=document.getElementById("adv-sounds-screen"),k=document.getElementById("btn-hide-adv-sounds");Q&&G&&(Q.onclick=()=>{G.classList.remove("hidden")}),k&&G&&(k.onclick=()=>{lu(),G.classList.add("hidden")});const b=(q,$)=>{const ee=document.getElementById(q);ee&&(ee.textContent=et[$]?"ON":"OFF",ee.classList.toggle("on",!!et[$]),ee.onclick=()=>{const re=ee.textContent==="ON";ee.textContent=re?"OFF":"ON",ee.classList.toggle("on",!re),et[$]=!re,K0()})};b("set-sfx-shoot-btn","sfx_shoot"),b("set-sfx-hit-btn","sfx_hit"),b("set-sfx-death-btn","sfx_enemy_death"),b("set-sfx-xp-btn","sfx_xp"),b("set-sfx-lvl-btn","sfx_lvlup"),b("set-sfx-phit-btn","sfx_player_hit"),b("set-sfx-siren-btn","sfx_siren"),b("set-hp-glow-btn","lowHpGlow");const btnInsanity=document.getElementById("set-insanity-btn");btnInsanity&&(btnInsanity.onclick=()=>{const inRun=!!(w.G&&w.G.running&&!w.G.over);if(inRun)return;if(!isInsanityUnlocked()){updateInsanitySettingUI();return;}const re=btnInsanity.textContent==="ON";btnInsanity.textContent=re?"OFF":"ON",btnInsanity.classList.toggle("on",!re),et.insanity=!re;if(et.insanity)et.bossMode=!1;K0();xs();updateDamageless();});updateInsanitySettingUI();const btnBoss=document.getElementById("set-boss-btn");btnBoss&&(btnBoss.onclick=()=>{const inRunB=!!(w.G&&w.G.running&&!w.G.over);if(inRunB){updateInsanitySettingUI();return;}const reB=btnBoss.textContent==="ON";btnBoss.textContent=reB?"OFF":"ON",btnBoss.classList.toggle("on",!reB),et.bossMode=!reB;if(et.bossMode)et.insanity=!1;K0(),xs(),updateDamageless(),updateInsanitySettingUI();});updateInsanitySettingUI();
+(()=>{
+  const btnGfxLow = document.getElementById("gfx-preset-low");
+  const btnGfxMed = document.getElementById("gfx-preset-medium");
+  const btnGfxHigh = document.getElementById("gfx-preset-high");
+
+  const selectGfxPreset = (preset) => {
+    et.graphicsPreset = preset;
+    K0();
+    [btnGfxLow, btnGfxMed, btnGfxHigh].forEach(b => b && b.classList.remove("active"));
+    if (preset === "low" && btnGfxLow) btnGfxLow.classList.add("active");
+    if (preset === "medium" && btnGfxMed) btnGfxMed.classList.add("active");
+    if (preset === "high" && btnGfxHigh) btnGfxHigh.classList.add("active");
+    const cEl = document.getElementById("c");
+    if (cEl) {
+      if (preset === "high") {
+        cEl.classList.add("hdr-mode");
+      } else {
+        cEl.classList.remove("hdr-mode");
+      }
+    }
+  };
+
+  selectGfxPreset(et.graphicsPreset || "high");
+  try { window.dispatchEvent(new Event("resize")); } catch (e) {}
+  if (btnGfxLow) btnGfxLow.onclick = () => selectGfxPreset("low");
+  if (btnGfxMed) btnGfxMed.onclick = () => selectGfxPreset("medium");
+  if (btnGfxHigh) btnGfxHigh.onclick = () => selectGfxPreset("high");
+
+  const btnFps60 = document.getElementById("fps-target-60");
+  const btnFps120 = document.getElementById("fps-target-120");
+  const btnFpsAuto = document.getElementById("fps-target-auto");
+  const selectFpsTarget = (mode) => {
+    et.targetFps = mode;
+    K0();
+    [btnFps60, btnFps120, btnFpsAuto].forEach(b => b && b.classList.remove("active"));
+    if (mode === "60hz" && btnFps60) btnFps60.classList.add("active");
+    if (mode === "120hz" && btnFps120) btnFps120.classList.add("active");
+    if (mode === "auto" && btnFpsAuto) btnFpsAuto.classList.add("active");
+    lastRenderT = 0;
+  };
+  selectFpsTarget(et.targetFps || "auto");
+  if (btnFps60) btnFps60.onclick = () => selectFpsTarget("60hz");
+  if (btnFps120) btnFps120.onclick = () => selectFpsTarget("120hz");
+  if (btnFpsAuto) btnFpsAuto.onclick = () => selectFpsTarget("auto");
+
+  const btnShowFps = document.getElementById("set-show-fps-btn");
+  if (btnShowFps) {
+    btnShowFps.textContent = et.showFps ? "ON" : "OFF";
+    btnShowFps.classList.toggle("on", !!et.showFps);
+    btnShowFps.onclick = () => {
+      et.showFps = !et.showFps;
+      btnShowFps.textContent = et.showFps ? "ON" : "OFF";
+      btnShowFps.classList.toggle("on", et.showFps);
+      K0();
+      updateFpsDisplayState();
+    };
+  }
+  updateFpsDisplayState();
+})();const s=document.getElementById("btn-over-menu"),C=document.getElementById("btn-win-menu"),A=document.getElementById("start-screen"),D=document.getElementById("over-screen"),P=document.getElementById("win-screen");s&&A&&D&&(s.onclick=()=>{Xl(),D.classList.add("hidden"),A.classList.remove("hidden")}),C&&A&&P&&(C.onclick=()=>{Xl(),P.classList.add("hidden"),A.classList.remove("hidden")});const Y=document.getElementById("btn-reset-scores"),K=document.getElementById("reset-confirm"),le=document.getElementById("btn-reset-yes"),F=document.getElementById("btn-reset-no"),x=document.getElementById("btn-show-achievements"),ie=document.getElementById("btn-hide-achievements"),fe=document.getElementById("achievements-screen");x&&fe&&(x.onclick=()=>{Ih(),fe.classList.remove("hidden")}),ie&&fe&&(ie.onclick=()=>fe.classList.add("hidden")),Y&&K&&(Y.onclick=()=>K.style.display="flex"),F&&K&&(F.onclick=()=>K.style.display="none"),le&&K&&(le.onclick=()=>{localStorage.removeItem("galaxy_outlast_scores"),localStorage.removeItem("galaxy_outlast_scores_insanity"),localStorage.removeItem("galaxy_outlast_scores_boss"),localStorage.removeItem("galaxy_outlast_damageless_boss"),localStorage.removeItem("galaxy_outlast_damageless_normal"),localStorage.removeItem("galaxy_outlast_damageless_insanity"),localStorage.removeItem("galaxy_outlast_damageless_best"),localStorage.removeItem("vamp_invaders_scores"),K.style.display="none";const q=document.getElementById("hi-val");q&&(q.textContent="0"),setScoreTab(scoreTab)});window.__bootDone=!0,window.__bootStage="done"}catch(r){console.error("Failed to boot game",r);window.__showFatal&&window.__showFatal("BOOT FAILED: "+((r&&(r.stack||r.message))||String(r)))}},50)),()=>{Wv()}),[f]),P0.jsx("div",{ref:a,dangerouslySetInnerHTML:{__html:gv}})}vv.createRoot(document.getElementById("root")).render(P0.jsx(eo.StrictMode,{children:P0.jsx(lg,{})}));
