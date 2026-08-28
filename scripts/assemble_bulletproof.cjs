@@ -24,13 +24,6 @@ const posSfxBuf = s2.indexOf('let Fe=null');
 const posWpnIcons = s2.indexOf('const WPN_ICONS=') !== -1 ? s2.indexOf('const WPN_ICONS=') : s2.indexOf('const WPN_ICONS');
 const posAl = s2.indexOf(',al=[');
 const posPl = s2.indexOf(',pl=[');
-const posW = s2.indexOf(',w={G:');
-const posPb = s2.indexOf('function _pb(');
-const posSo = s2.indexOf('function so(');
-const posZ0 = s2.indexOf('function Z0(');
-const posH0 = s2.indexOf('function H0(');
-const posCanvasVars = s2.indexOf('let at,Dn,Ga,Pa=null');
-const posScoreKey = s2.indexOf('function scoreKey(');
 const posXv = s2.indexOf('function xv(');
 const posCreateRoot = s2.indexOf('vv.createRoot(');
 
@@ -112,81 +105,49 @@ export {
 fs.writeFileSync('src/game/audio.js', audioJs);
 console.log('Created src/game/audio.js');
 
-// 3. src/game/weapons.js
-const weaponsCode = s2.slice(posWpnIcons, posAl).trim();
-const plCode = 'const ' + s2.slice(posPl + 1, posW).trim() + ';';
+// 3. src/game/engine.js (Contains constants, weapons, state, renderers, prewarmers, and score systems)
+const enginePart1 = s2.slice(posGameConst, posSfxBuf).trim();
+const enginePart2 = s2.slice(posWpnIcons, posAl).trim();
+const enginePart3 = 'const ' + s2.slice(posPl + 1, posXv).trim();
 
-const weaponsJs = `/**
- * @fileoverview Weapon Upgrades Catalog (ha), Weapon Icons (WPN_ICONS), and Enemy Stats (pl).
+const engineJs = `/**
+ * @fileoverview Unified Galaxy Outlast Game Engine.
  */
-${weaponsCode}
-
-${plCode}
-
-window.WPN_ICONS = WPN_ICONS;
-window.ha = ha;
-window.pl = pl;
-
-export {
-  WPN_ICONS,
-  ha,
-  pl
-};
-`;
-fs.writeFileSync('src/game/weapons.js', weaponsJs);
-console.log('Created src/game/weapons.js');
-
-// 4. src/game/state.js
-const stateHeadCode = s2.slice(posGameConst, posSfxBuf).trim();
-const wCode = 'const ' + s2.slice(posW + 1, posPb).trim();
-const z0Code = s2.slice(posZ0, posH0).trim();
-const scoresCode = s2.slice(posScoreKey, posXv).trim();
-
-const stateJs = `/**
- * @fileoverview Game State Factory (Z0), Game Constants, Settings & High Score Tables.
- */
-import { al } from './bosses.js';
-import { ha, pl, WPN_ICONS } from './weapons.js';
+import { bossSkullImg, al } from './bosses.js';
 import {
-  fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu,
-  playBufferSfx, pauseSiren, sfxBuffers
+  sirenAudioSrc, sfxBuffers, playBufferSfx, pauseSiren,
+  fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu, Fe
 } from './audio.js';
-import { H0, _pb } from './render.js';
 
-${stateHeadCode}
+${enginePart1}
 
-${wCode}
+${enginePart2}
 
-${z0Code}
+${enginePart3}
 
-${scoresCode}
-
+// Attach all engine symbols to window
 window.GAME_CONSTANTS = GAME_CONSTANTS;
 window.w = w;
 window.et = et;
-window.Gh = Gh;
-window.Mv = Mv;
-window.Rh = Rh;
-window.getModeHighScore = getModeHighScore;
-window.getModeDamagelessHighScore = getModeDamagelessHighScore;
-window.triggerWaveTransitionGC = triggerWaveTransitionGC;
-window.prewarmGraphics = prewarmGraphics;
-window.updateFpsDisplayState = updateFpsDisplayState;
-window.K0 = K0;
-window.qh = qh;
-window.N0 = N0;
-window.Xh = Xh;
+window.WPN_ICONS = WPN_ICONS;
+window.ha = ha;
+window.pl = pl;
+window.Z0 = Z0;
 window.kh = kh;
+window.so = so;
+window.ao = ao;
+window._pb = _pb;
+window.Ln = Ln;
+window.H0 = H0;
+window.Qh = Qh;
+window.Jv = Jv;
+window.N0 = N0;
+window.qh = qh;
+window.ma = ma;
+window.Bv = Bv;
 window.Av = Av;
 window.wv = wv;
 window.zv = zv;
-window.Bv = Bv;
-window.ma = ma;
-window.ct = ct;
-window.Ov = Ov;
-window.Lv = Lv;
-window.gl = gl;
-window.jt = jt;
 window.Gv = Gv;
 window.Ra = Ra;
 window.Ah = Ah;
@@ -195,49 +156,49 @@ window.Hv = Hv;
 window.Pv = Pv;
 window.Uv = Uv;
 window.Nv = Nv;
-window._bsc = _bsc;
-window._asc = _asc;
-window.Z0 = Z0;
-window.Kv = Kv;
+window.Gh = Gh;
+window.Mv = Mv;
+window.Rh = Rh;
+window.K0 = K0;
 window.scoreKey = scoreKey;
 window.runScoreKey = runScoreKey;
 window.loadScores = loadScores;
 window.updateDamageless = updateDamageless;
 window.setScoreTab = setScoreTab;
-window.scoreTab = scoreTab;
 window.Lh = Lh;
 window.xs = xs;
-window.SCORE_TABLE_HEADER = SCORE_TABLE_HEADER;
-window.oo = oo;
-window.Fv = Fv;
+window.Wv = Wv;
+window.Xl = Xl;
+window.Bh = Bh;
+window.Ui = Ui;
+window.Ih = Ih;
+window.prewarmGraphics = prewarmGraphics;
+window.triggerWaveTransitionGC = triggerWaveTransitionGC;
+window.updateFpsDisplayState = updateFpsDisplayState;
 
 export {
   GAME_CONSTANTS,
   w,
   et,
-  Gh,
-  Mv,
-  Rh,
-  getModeHighScore,
-  getModeDamagelessHighScore,
-  triggerWaveTransitionGC,
-  prewarmGraphics,
-  updateFpsDisplayState,
-  K0,
-  qh,
-  N0,
-  Xh,
+  WPN_ICONS,
+  ha,
+  pl,
+  Z0,
   kh,
+  so,
+  ao,
+  _pb,
+  Ln,
+  H0,
+  Qh,
+  Jv,
+  N0,
+  qh,
+  ma,
+  Bv,
   Av,
   wv,
   zv,
-  Bv,
-  ma,
-  ct,
-  Ov,
-  Lv,
-  gl,
-  jt,
   Gv,
   Ra,
   Ah,
@@ -246,83 +207,58 @@ export {
   Pv,
   Uv,
   Nv,
-  _bsc,
-  _asc,
-  Z0,
-  Kv,
+  Gh,
+  Mv,
+  Rh,
+  K0,
   scoreKey,
   runScoreKey,
   loadScores,
   updateDamageless,
   setScoreTab,
-  scoreTab,
   Lh,
   xs,
-  SCORE_TABLE_HEADER,
-  oo,
-  Fv
+  Wv,
+  Xl,
+  Bh,
+  Ui,
+  Ih,
+  prewarmGraphics,
+  triggerWaveTransitionGC,
+  updateFpsDisplayState
 };
+`;
+fs.writeFileSync('src/game/engine.js', engineJs);
+console.log('Created src/game/engine.js');
+
+// 4. src/game/state.js, src/game/render.js, src/game/weapons.js
+const stateJs = `/**
+ * @fileoverview Game Constants & State Interface.
+ */
+export const GAME_CONSTANTS = {
+  CANVAS_WIDTH: 433,
+  CANVAS_HEIGHT: 915,
+  HEADER_HEIGHT: 86,
+  MAX_WAVES: 30
+};
+
+export * from './engine.js';
 `;
 fs.writeFileSync('src/game/state.js', stateJs);
 console.log('Created src/game/state.js');
 
-// 5. src/game/render.js
-const renderLoopCode = s2.slice(posPb, posSo).trim();
-const soCode = s2.slice(posSo, posZ0).trim();
-const prewarmCode = s2.slice(posH0, posCanvasVars).trim();
-
-const renderJs = `/**
- * @fileoverview Main Canvas Renderer (so), Bullet Spawner (_pb), Update Loop (ao), Ship Drawing (Ln) & Texture Prewarming (H0, Qh, Jv).
- */
-import { al, bossSkullImg } from './bosses.js';
-import { ha, pl, WPN_ICONS } from './weapons.js';
-import {
-  w, et, Z0, xs, Fv, GAME_CONSTANTS, K0,
-  qh, N0, Xh, kh, Av, wv, zv, Bv, ma, ct, Ov, Lv, gl, jt, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, _bsc, _asc,
-  prewarmGraphics, triggerWaveTransitionGC
-} from './state.js';
-import {
-  fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu
-} from './audio.js';
-
-${renderLoopCode}
-
-${soCode}
-
-${prewarmCode}
-
-window._pb = _pb;
-window.ao = ao;
-window.Ln = Ln;
-window.hu = hu;
-window.io = io;
-window.so = so;
-window.H0 = H0;
-window.Qh = Qh;
-window.Jv = Jv;
-
-export {
-  _pb,
-  ao,
-  Ln,
-  hu,
-  io,
-  so,
-  H0,
-  Qh,
-  Jv
-};
-`;
-fs.writeFileSync('src/game/render.js', renderJs);
+fs.writeFileSync('src/game/render.js', `export * from './engine.js';\n`);
 console.log('Created src/game/render.js');
 
-// 6. src/game/diagnostics.js
+fs.writeFileSync('src/game/weapons.js', `export * from './engine.js';\n`);
+console.log('Created src/game/weapons.js');
+
+// 5. src/game/diagnostics.js
 fs.writeFileSync('src/game/diagnostics.js', `// src/game/diagnostics.js - Developer Diagnostics & Profiler Overlay\n${s3.trim()}\nexport {};\n`);
 console.log('Created src/game/diagnostics.js');
 
-// 7. src/main.js
+// 6. src/main.js
 const reactCode = s2.slice(posReact, posGameConst).trim();
-const canvasAndUiHandlers = s2.slice(posCanvasVars, posScoreKey).trim();
 const xvCode = s2.slice(posXv, posCreateRoot).trim();
 const mountCode = s2.slice(posCreateRoot).trim();
 
@@ -378,19 +314,16 @@ ${s1.trim()}
 
 // 3. Game Core Modules & Full Cross-Module Imports
 import { bossSkullImg, al } from './game/bosses.js';
-import { WPN_ICONS, ha, pl } from './game/weapons.js';
 import {
   sirenAudioSrc, sfxBuffers, playBufferSfx, pauseSiren,
   fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu, Fe
 } from './game/audio.js';
 import {
-  GAME_CONSTANTS, w, et, Gh, Mv, Rh, getModeHighScore, getModeDamagelessHighScore,
-  triggerWaveTransitionGC, prewarmGraphics, updateFpsDisplayState, K0,
-  qh, N0, Xh, kh, Av, wv, zv, Bv, ma, ct, Ov, Lv, gl, jt, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv,
-  _bsc, _asc, Z0, Kv, scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab, scoreTab,
-  Lh, xs, SCORE_TABLE_HEADER, oo, Fv
-} from './game/state.js';
-import { _pb, ao, Ln, hu, io, so, H0, Qh, Jv } from './game/render.js';
+  GAME_CONSTANTS, w, et, WPN_ICONS, ha, pl, Z0, kh, so, ao, _pb, Ln, H0, Qh, Jv,
+  N0, qh, ma, Bv, Av, wv, zv, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, Gh, Mv, Rh, K0,
+  scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab, Lh, xs,
+  Wv, Xl, Bh, Ui, Ih, prewarmGraphics, triggerWaveTransitionGC, updateFpsDisplayState
+} from './game/engine.js';
 import './game/diagnostics.js';
 
 // Global shared state for UI & FPS timers across React & xv scopes
@@ -400,13 +333,10 @@ let ie = 0;
 // 4. React Runtime & UI Markup
 ${reactCode}
 
-// 5. Canvas State & UI Modal Event Handlers
-${canvasAndUiHandlers}
-
-// 6. Main Canvas Initialization, Event Listeners, Menus & React Root Component
+// 5. Main Canvas Initialization, Event Listeners, Menus & React Root Component
 ${xvCode}
 
-// 7. React DOM Mount
+// 6. React DOM Mount
 ${mountCode}
 `;
 fs.writeFileSync('src/main.js', mainJs);
