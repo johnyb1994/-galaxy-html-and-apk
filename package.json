@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node scripts/verify.cjs",
+    "check": "vite build && node scripts/verify.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.1",
