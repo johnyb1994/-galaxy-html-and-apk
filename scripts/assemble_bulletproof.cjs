@@ -24,6 +24,7 @@ const posSfxBuf = s2.indexOf('let Fe=null');
 const posWpnIcons = s2.indexOf('const WPN_ICONS=') !== -1 ? s2.indexOf('const WPN_ICONS=') : s2.indexOf('const WPN_ICONS');
 const posAl = s2.indexOf(',al=[');
 const posPl = s2.indexOf(',pl=[');
+const posCanvasVars = s2.indexOf('let at,Dn,Ga,Pa=null');
 const posXv = s2.indexOf('function xv(');
 const posCreateRoot = s2.indexOf('vv.createRoot(');
 
@@ -105,10 +106,10 @@ export {
 fs.writeFileSync('src/game/audio.js', audioJs);
 console.log('Created src/game/audio.js');
 
-// 3. src/game/engine.js (Contains constants, weapons, state, renderers, prewarmers, and score systems)
+// 3. src/game/engine.js (Contains constants, weapons, state, renderers, and prewarmers)
 const enginePart1 = s2.slice(posGameConst, posSfxBuf).trim();
 const enginePart2 = s2.slice(posWpnIcons, posAl).trim();
-const enginePart3 = 'const ' + s2.slice(posPl + 1, posXv).trim();
+const enginePart3 = 'const ' + s2.slice(posPl + 1, posCanvasVars).trim();
 
 const engineJs = `/**
  * @fileoverview Unified Galaxy Outlast Game Engine.
@@ -122,6 +123,10 @@ import {
 ${enginePart1}
 
 ${enginePart2}
+
+// Global score bridge helpers for engine New Game (kh)
+function loadScores(k){ try{ return JSON.parse(localStorage.getItem(k)||"[]"); }catch(e){ return []; } }
+function xs(){ if(typeof window!=="undefined"&&window.xs) window.xs(); }
 
 ${enginePart3}
 
@@ -160,18 +165,6 @@ window.Gh = Gh;
 window.Mv = Mv;
 window.Rh = Rh;
 window.K0 = K0;
-window.scoreKey = scoreKey;
-window.runScoreKey = runScoreKey;
-window.loadScores = loadScores;
-window.updateDamageless = updateDamageless;
-window.setScoreTab = setScoreTab;
-window.Lh = Lh;
-window.xs = xs;
-window.Wv = Wv;
-window.Xl = Xl;
-window.Bh = Bh;
-window.Ui = Ui;
-window.Ih = Ih;
 window.prewarmGraphics = prewarmGraphics;
 window.triggerWaveTransitionGC = triggerWaveTransitionGC;
 window.updateFpsDisplayState = updateFpsDisplayState;
@@ -211,18 +204,6 @@ export {
   Mv,
   Rh,
   K0,
-  scoreKey,
-  runScoreKey,
-  loadScores,
-  updateDamageless,
-  setScoreTab,
-  Lh,
-  xs,
-  Wv,
-  Xl,
-  Bh,
-  Ui,
-  Ih,
   prewarmGraphics,
   triggerWaveTransitionGC,
   updateFpsDisplayState
@@ -259,6 +240,7 @@ console.log('Created src/game/diagnostics.js');
 
 // 6. src/main.js
 const reactCode = s2.slice(posReact, posGameConst).trim();
+const canvasAndUiHandlers = s2.slice(posCanvasVars, posXv).trim();
 const xvCode = s2.slice(posXv, posCreateRoot).trim();
 const mountCode = s2.slice(posCreateRoot).trim();
 
@@ -321,8 +303,7 @@ import {
 import {
   GAME_CONSTANTS, w, et, WPN_ICONS, ha, pl, Z0, kh, so, ao, _pb, Ln, H0, Qh, Jv,
   N0, qh, ma, Bv, Av, wv, zv, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, Gh, Mv, Rh, K0,
-  scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab, Lh, xs,
-  Wv, Xl, Bh, Ui, Ih, prewarmGraphics, triggerWaveTransitionGC, updateFpsDisplayState
+  prewarmGraphics, triggerWaveTransitionGC, updateFpsDisplayState
 } from './game/engine.js';
 import './game/diagnostics.js';
 
@@ -333,10 +314,13 @@ let ie = 0;
 // 4. React Runtime & UI Markup
 ${reactCode}
 
-// 5. Main Canvas Initialization, Event Listeners, Menus & React Root Component
+// 5. Canvas State, High Scores & UI Modal Event Handlers
+${canvasAndUiHandlers}
+
+// 6. Main Canvas Initialization, Event Listeners, Menus & React Root Component
 ${xvCode}
 
-// 6. React DOM Mount
+// 7. React DOM Mount
 ${mountCode}
 `;
 fs.writeFileSync('src/main.js', mainJs);
