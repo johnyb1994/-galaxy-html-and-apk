@@ -3,45 +3,44 @@ import './styles/main.css';
 
 // 1. Boot Error Reporter
 (function(){
-        var shown=!1;
-        function show(tag,msg){
-          try{
-            var box=document.getElementById("__boot_err");
-            if(!box){
-              box=document.createElement("div");
-              box.id="__boot_err";
-              box.style.cssText="position:fixed;left:4px;right:4px;bottom:4px;z-index:2147483647;background:#5a0011;color:#ffd7de;font:12px/1.4 monospace;padding:8px 10px;border-radius:6px;white-space:pre-wrap;max-height:45%;overflow:auto;box-shadow:0 0 12px #000;";
-              (document.body||document.documentElement).appendChild(box);
-              box.addEventListener("click",function(){box.parentNode&&box.parentNode.removeChild(box);});
-            }
-            if(shown&&tag!=="BOOT")return;
-            shown=!0;
-            box.textContent="GALAXY OUTLAST "+tag+" (build v1.33):\n"+String(msg).substring(0,800)+"\n\n(tap to dismiss)";
-          }catch(e){}
-        }
-        window.__showFatal=function(msg){show("ERROR",msg);};
-        window.__bootStage="page-loaded";
-        setTimeout(function(){
-          try{
-            if(!window.__bootDone){
-              var bs=document.getElementById("btn-start");
-              show("STARTUP STALL","stage="+window.__bootStage+
-                " | launchWired="+(!!(bs&&bs.onclick))+
-                " | view="+window.innerWidth+"x"+window.innerHeight+
-                " dpr="+window.devicePixelRatio);
-            }
-          }catch(e){}
-        },3000);
-        window.addEventListener("error",function(e){
-          var r=e&&(e.error||e.message);
-          show("ERROR",r&&((r.stack||r.message)||String(r))||String(e));
-        });
-        window.addEventListener("unhandledrejection",function(e){
-          var r=e&&e.reason,s=(r&&(r.stack||r.message))||String(r);
-          if(/orientation\.lock|ServiceWorkerRegistration|serviceWorker/i.test(s))return;
-          show("ASYNC ERROR",s);
-        });
-      })();
+  var shown = !1;
+  function show(tag, msg) {
+    try {
+      var box = document.getElementById("__boot_err");
+      if (!box) {
+        box = document.createElement("div");
+        box.id = "__boot_err";
+        box.style.cssText = "position:fixed;left:10px;right:10px;top:15px;max-height:85vh;z-index:2147483647;background:rgba(90,0,17,0.97);border:2px solid #ff4466;color:#ffffff;font:13px/1.4 monospace;padding:16px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.9);white-space:pre-wrap;overflow-y:auto;";
+        (document.body || document.documentElement).appendChild(box);
+        box.addEventListener("click", function() { box.parentNode && box.parentNode.removeChild(box); });
+      }
+      shown = !0;
+      box.textContent = "GALAXY OUTLAST " + tag + " (build v1.33):\n" + String(msg).substring(0, 1200) + "\n\n[ TAP ANYWHERE ON THIS BOX TO DISMISS ]";
+    } catch(e) {}
+  }
+  window.__showFatal = function(msg) { show("ERROR", msg); };
+  window.__bootStage = "page-loaded";
+  setTimeout(function() {
+    try {
+      if (!window.__bootDone) {
+        var bs = document.getElementById("btn-start");
+        show("STARTUP STALL", "stage=" + window.__bootStage +
+          " | launchWired=" + (!!(bs && bs.onclick)) +
+          " | view=" + window.innerWidth + "x" + window.innerHeight +
+          " dpr=" + window.devicePixelRatio);
+      }
+    } catch(e) {}
+  }, 4000);
+  window.addEventListener("error", function(e) {
+    var r = e && (e.error || e.message);
+    show("ERROR", r && ((r.stack || r.message) || String(r)) || String(e));
+  });
+  window.addEventListener("unhandledrejection", function(e) {
+    var r = e && e.reason, s = (r && (r.stack || r.message)) || String(r);
+    if (/orientation\.lock|ServiceWorkerRegistration|serviceWorker/i.test(s)) return;
+    show("PROMISE REJECTION", s);
+  });
+})();
 
 // 2. Service Worker & Cache Cleanup
 if ('serviceWorker' in navigator) {
@@ -64,13 +63,13 @@ import { bossSkullImg, al } from './game/bosses.js';
 import { WPN_ICONS, ha, pl } from './game/weapons.js';
 import {
   sirenAudioSrc, sfxBuffers, playBufferSfx, pauseSiren,
-  fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu
+  fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu, Fe
 } from './game/audio.js';
 import {
   GAME_CONSTANTS, ce, Te, w, et, Gh, Mv, Rh, getModeHighScore, getModeDamagelessHighScore,
   Tv, _v, triggerWaveTransitionGC, prewarmGraphics, updateFpsDisplayState, K0,
   qh, N0, Xh, kh, Av, wv, zv, Bv, ma, ct, Ov, Lv, gl, jt, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv,
-  _bsc, _asc, Z0, Kv, H0, scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab,
+  _bsc, _asc, Z0, Kv, H0, scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab, scoreTab,
   Lh, xs, SCORE_TABLE_HEADER, oo, Fv
 } from './game/state.js';
 import { _pb, ao, Ln, hu, io, so, Qh, Jv } from './game/render.js';
