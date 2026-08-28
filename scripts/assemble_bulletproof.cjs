@@ -274,7 +274,7 @@ const s0Enhanced = `(function(){
         box.addEventListener("click", function() { box.parentNode && box.parentNode.removeChild(box); });
       }
       shown = !0;
-      box.textContent = "GALAXY OUTLAST " + tag + " (build v1.33):\\n" + String(msg).substring(0, 1200) + "\\n\\n[ TAP ANYWHERE ON THIS BOX TO DISMISS ]";
+      box.textContent = "GALAXY OUTLAST " + tag + " (build v1.34):\\n" + String(msg).substring(0, 1200) + "\\n\\n[ TAP ANYWHERE ON THIS BOX TO DISMISS ]";
     } catch(e) {}
   }
   window.__showFatal = function(msg) { show("ERROR", msg); };
