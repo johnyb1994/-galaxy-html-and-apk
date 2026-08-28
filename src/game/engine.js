@@ -219,6 +219,8 @@ window.Nv = Nv;
 window.Gh = Gh;
 window.Mv = Mv;
 window.Rh = Rh;
+window.getModeHighScore = getModeHighScore;
+window.getModeDamagelessHighScore = getModeDamagelessHighScore;
 window.K0 = K0;
 window.prewarmGraphics = prewarmGraphics;
 window.triggerWaveTransitionGC = triggerWaveTransitionGC;
@@ -258,6 +260,8 @@ export {
   Gh,
   Mv,
   Rh,
+  getModeHighScore,
+  getModeDamagelessHighScore,
   K0,
   prewarmGraphics,
   triggerWaveTransitionGC,

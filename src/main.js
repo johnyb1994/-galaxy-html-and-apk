@@ -66,7 +66,8 @@ import {
 } from './game/audio.js';
 import {
   GAME_CONSTANTS, w, et, WPN_ICONS, ha, pl, Z0, kh, so, ao, _pb, Ln, H0, Qh, Jv,
-  N0, qh, ma, Bv, Av, wv, zv, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, Gh, Mv, Rh, K0,
+  N0, qh, ma, Bv, Av, wv, zv, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, Gh, Mv, Rh,
+  getModeHighScore, getModeDamagelessHighScore, K0,
   prewarmGraphics, triggerWaveTransitionGC, updateFpsDisplayState
 } from './game/engine.js';
 import './game/diagnostics.js';
