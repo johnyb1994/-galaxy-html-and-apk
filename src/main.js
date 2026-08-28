@@ -59,12 +59,20 @@ if ('serviceWorker' in navigator) {
         }
       }
 
-// 3. Game Core Modules
-import './game/bosses.js';
-import './game/weapons.js';
-import './game/audio.js';
-import './game/state.js';
-import './game/render.js';
+// 3. Game Core Modules & Full Cross-Module Imports
+import { bossSkullImg, al } from './game/bosses.js';
+import { WPN_ICONS, ha, pl, eg, lo, tg } from './game/weapons.js';
+import {
+  sirenAudioSrc, sfxBuffers, playBufferSfx, pauseSiren,
+  fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu
+} from './game/audio.js';
+import {
+  GAME_CONSTANTS, K0, Gh, Sv, ce, Mv, Te, Rh, getModeHighScore, getModeDamagelessHighScore,
+  Hh, Tv, _v, et, w, Z0, scoreKey, runScoreKey, loadScores, updateDamageless, setScoreTab,
+  Lh, xs, SCORE_TABLE_HEADER, oo, Fv,
+  qh, N0, Xh, kh, Av, wv, zv, Bv, ma, ct, Ov, Lv, gl, jt, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, _bsc, _asc
+} from './game/state.js';
+import { _pb, so, Qh, Jv } from './game/render.js';
 import './game/diagnostics.js';
 
 // 4. React Runtime & UI Markup

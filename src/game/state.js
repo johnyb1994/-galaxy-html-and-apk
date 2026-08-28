@@ -1,6 +1,12 @@
-// src/game/state.js - Game State, Constants & High Scores
+/**
+ * @fileoverview Game State Factory (Z0), Game Constants, Settings & High Score Tables.
+ */
 import { al } from './bosses.js';
 import { ha, pl, WPN_ICONS } from './weapons.js';
+import {
+  fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu,
+  playBufferSfx, pauseSiren, sfxBuffers
+} from './audio.js';
 
 const GAME_CONSTANTS={CANVAS_WIDTH:433,CANVAS_HEIGHT:915,HEADER_HEIGHT:86,MAX_WAVES:30,MAX_SAVED_SCORES:5,SPEED_DEMON_LIMIT_MS:540000,OVERPOWERED_UPGRADE_COUNT:25};function Gh(a,f){w.w=a,w.h=f}let Sv=1;const ce={hpFill:null,hpVal:null,xpFill:null,xpVal:null,lvlLbl:null,waveLbl:null,scoreLbl:null,hiVal:null,hiLbl:null,killLbl:null,timeLbl:null,maxBadges:null,bossBarFill:null,bossBarVal:null,bestTimeLbl:null,bestTimeWrap:null};function Mv(){ce.hpFill=document.getElementById("hp-fill"),ce.hpVal=document.getElementById("hp-val"),ce.xpFill=document.getElementById("xp-fill"),ce.xpVal=document.getElementById("xp-val"),ce.lvlLbl=document.getElementById("lvl-lbl"),ce.waveLbl=document.getElementById("wave-lbl"),ce.scoreLbl=document.getElementById("score-lbl"),ce.hiVal=document.getElementById("hi-val"),ce.hiLbl=document.getElementById("hi-lbl"),ce.killLbl=document.getElementById("kill-lbl"),ce.timeLbl=document.getElementById("time-lbl"),ce.maxBadges=document.getElementById("max-badges"),ce.bossBarFill=document.getElementById("boss-bar-fill"),ce.bossBarVal=document.getElementById("boss-bar-val"),ce.bestTimeLbl=document.getElementById("best-time-lbl"),ce.bestTimeWrap=document.getElementById("best-time-wrap")}const Te={hpFillWidth:"",hpValText:"",xpFillWidth:"",xpValText:"",lvlText:"",waveText:"",scoreText:"",killText:"",timeText:"",hiText:"",hiLblText:"",bossBarFillWidth:"",bossBarValText:"",maxBadgesHtml:"",bestTimeText:""};function Rh(){Te.hpFillWidth="",Te.hpValText="",Te.xpFillWidth="",Te.xpValText="",Te.lvlText="",Te.waveText="",Te.scoreText="",Te.killText="",Te.timeText="",Te.hiText="",Te.hiLblText="",Te.bossBarFillWidth="",Te.bossBarValText="",Te.maxBadgesHtml="",Te.bestTimeText=""}function getModeHighScore(isIns,isBoss){const k=isBoss?"galaxy_outlast_scores_boss":isIns?"galaxy_outlast_scores_insanity":"galaxy_outlast_scores";const s=loadScores(k),v=s.length&&s[0]?Number(s[0].score):0;return Number.isFinite(v)&&v>0?v:0}function getModeDamagelessHighScore(isIns,isBoss){const k=isBoss?"galaxy_outlast_damageless_boss":isIns?"galaxy_outlast_damageless_insanity":"galaxy_outlast_damageless_normal";let v=NaN;try{v=parseInt(localStorage.getItem(k)||((isIns||isBoss)?"0":(localStorage.getItem("galaxy_outlast_damageless_best")||"0")),10)}catch{}return Number.isFinite(v)&&v>0?v:0}let Hh=0;function Tv(){const isIns=w.G?!!w.G.insanityMode:!!(et&&et.insanity),isBoss=w.G?!!w.G.bossMode:!!(et&&et.bossMode);Hh=getModeHighScore(isIns,isBoss)}function _v(){return Hh}const et=(()=>{const a={sfx_shoot:!0,sfx_hit:!0,sfx_enemy_death:!0,sfx_xp:!0,sfx_lvlup:!0,sfx_player_hit:!0,sfx_siren:!0,lowHpGlow:!0,sfxVolume:.5,graphicsPreset:"high",targetFps:"auto",showFps:!1,insanity:!1,bossMode:!1};try{const f=JSON.parse(localStorage.getItem("galaxy_outlast_settings")||"{}");return Object.assign({},a,f)}catch{return a}})();
 
@@ -212,6 +218,31 @@ window.scoreKey = scoreKey;
 window.runScoreKey = runScoreKey;
 window.SCORE_TABLE_HEADER = SCORE_TABLE_HEADER;
 
+window.qh = qh;
+window.N0 = N0;
+window.Xh = Xh;
+window.kh = kh;
+window.Av = Av;
+window.wv = wv;
+window.zv = zv;
+window.Bv = Bv;
+window.ma = ma;
+window.ct = ct;
+window.Ov = Ov;
+window.Lv = Lv;
+window.gl = gl;
+window.jt = jt;
+window.Gv = Gv;
+window.Ra = Ra;
+window.Ah = Ah;
+window.Rv = Rv;
+window.Hv = Hv;
+window.Pv = Pv;
+window.Uv = Uv;
+window.Nv = Nv;
+window._bsc = _bsc;
+window._asc = _asc;
+
 export {
   GAME_CONSTANTS,
   K0,
@@ -238,5 +269,29 @@ export {
   xs,
   SCORE_TABLE_HEADER,
   oo,
-  Fv
+  Fv,
+  qh,
+  N0,
+  Xh,
+  kh,
+  Av,
+  wv,
+  zv,
+  Bv,
+  ma,
+  ct,
+  Ov,
+  Lv,
+  gl,
+  jt,
+  Gv,
+  Ra,
+  Ah,
+  Rv,
+  Hv,
+  Pv,
+  Uv,
+  Nv,
+  _bsc,
+  _asc
 };
