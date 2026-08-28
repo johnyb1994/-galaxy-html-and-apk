@@ -393,6 +393,10 @@ import {
 import { _pb, ao, Ln, hu, io, so, H0, Qh, Jv } from './game/render.js';
 import './game/diagnostics.js';
 
+// Global shared state for UI & FPS timers across React & xv scopes
+let lastRenderT = 0;
+let ie = 0;
+
 // 4. React Runtime & UI Markup
 ${reactCode}
 
