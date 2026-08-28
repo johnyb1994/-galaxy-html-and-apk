@@ -170,6 +170,12 @@ window.K0 = K0;
 window.prewarmGraphics = prewarmGraphics;
 window.triggerWaveTransitionGC = triggerWaveTransitionGC;
 window.updateFpsDisplayState = updateFpsDisplayState;
+window.Te = Te;
+window.ce = ce;
+window.Xh = Xh;
+window.ct = ct;
+window.Lv = Lv;
+window.Kv = Kv;
 
 export {
   GAME_CONSTANTS,
@@ -210,7 +216,13 @@ export {
   K0,
   prewarmGraphics,
   triggerWaveTransitionGC,
-  updateFpsDisplayState
+  updateFpsDisplayState,
+  Te,
+  ce,
+  Xh,
+  ct,
+  Lv,
+  Kv
 };
 `;
 fs.writeFileSync('src/game/engine.js', engineJs);
@@ -308,7 +320,8 @@ import {
   GAME_CONSTANTS, w, et, WPN_ICONS, ha, pl, Z0, kh, so, ao, _pb, Ln, H0, Qh, Jv,
   N0, qh, ma, Bv, Av, wv, zv, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, Gh, Mv, Rh,
   getModeHighScore, getModeDamagelessHighScore, K0,
-  prewarmGraphics, triggerWaveTransitionGC, updateFpsDisplayState
+  prewarmGraphics, triggerWaveTransitionGC, updateFpsDisplayState,
+  Te, ce, Xh, ct, Lv, Kv
 } from './game/engine.js';
 import './game/diagnostics.js';
 

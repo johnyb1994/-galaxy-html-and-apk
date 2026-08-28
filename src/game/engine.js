@@ -225,6 +225,12 @@ window.K0 = K0;
 window.prewarmGraphics = prewarmGraphics;
 window.triggerWaveTransitionGC = triggerWaveTransitionGC;
 window.updateFpsDisplayState = updateFpsDisplayState;
+window.Te = Te;
+window.ce = ce;
+window.Xh = Xh;
+window.ct = ct;
+window.Lv = Lv;
+window.Kv = Kv;
 
 export {
   GAME_CONSTANTS,
@@ -265,5 +271,11 @@ export {
   K0,
   prewarmGraphics,
   triggerWaveTransitionGC,
-  updateFpsDisplayState
+  updateFpsDisplayState,
+  Te,
+  ce,
+  Xh,
+  ct,
+  Lv,
+  Kv
 };
