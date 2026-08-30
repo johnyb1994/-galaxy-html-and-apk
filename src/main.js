@@ -30,7 +30,7 @@ import './styles/main.css';
           " dpr=" + window.devicePixelRatio);
       }
     } catch(e) {}
-  }, 4000);
+  }, 8000);
   window.addEventListener("error", function(e) {
     var r = e && (e.error || e.message);
     show("ERROR", r && ((r.stack || r.message) || String(r)) || String(e));

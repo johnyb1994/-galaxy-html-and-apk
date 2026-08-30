@@ -63,6 +63,13 @@ async function main() {
   await send('Log.enable');
 
   console.log('Navigating to page in Chrome...');
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: 433,
+    height: 915,
+    deviceScaleFactor: 2,
+    mobile: true,
+    screenOrientation: { angle: 0, type: 'portraitPrimary' }
+  });
   await send('Page.navigate', { url: fileUrl });
 
   console.log('Waiting 3s for browser boot and canvas warmup...');
@@ -139,6 +146,12 @@ async function main() {
   });
   console.log('5. Equipment modal test:', eqTest.result.result.value);
 
+  // Take screenshot of Main Menu
+  const ssMenu = await send('Page.captureScreenshot', { format: 'png' });
+  const fs = require('fs');
+  fs.writeFileSync('menu_screenshot.png', Buffer.from(ssMenu.result.data, 'base64'));
+  console.log('📸 Main menu screenshot saved to: galaxy_apk/menu_screenshot.png');
+
   // 6. Test Launch & 60 frames
   console.log('6. Testing LAUNCH and gameplay loop...');
   const launchTest = await send('Runtime.evaluate', {
@@ -154,9 +167,28 @@ async function main() {
       };
     })())`
   });
-  console.log('   Launch result:', launchTest.result.result.value);
+  console.log('   Launch result:', launchTest?.result?.result?.value || JSON.stringify(launchTest));
 
   await wait(2000);
+
+  // Take screenshot of Active Gameplay
+  const ssGame = await send('Page.captureScreenshot', { format: 'png' });
+  fs.writeFileSync('gameplay_screenshot.png', Buffer.from(ssGame.result.data, 'base64'));
+  console.log('📸 Gameplay screenshot saved to: galaxy_apk/gameplay_screenshot.png');
+
+  // Visual layout check
+  const visualLayout = await send('Runtime.evaluate', {
+    expression: `JSON.stringify((function() {
+      var cv = document.getElementById("canvas");
+      var diag = document.getElementById("dev-diag-panel");
+      var btn = document.getElementById("btn-start");
+      return {
+        canvas: cv ? { width: cv.width, height: cv.height, clientWidth: cv.clientWidth, clientHeight: cv.clientHeight, display: getComputedStyle(cv).display } : null,
+        diagPanel: diag ? { display: getComputedStyle(diag).display, position: getComputedStyle(diag).position, zIndex: getComputedStyle(diag).zIndex } : null
+      };
+    })())`
+  });
+  console.log('📐 Visual layout metrics:', visualLayout?.result?.result?.value);
 
   // Close tab
   await send('Page.close');

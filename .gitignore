@@ -11,3 +11,6 @@ android/.gradle/
 .DS_Store
 Thumbs.db
 *.log
+.chrome-temp-profile*/
+*.png
+!src/assets/*.png

@@ -21,14 +21,7 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         hideSystemUI();
 
-        // 1. Thread Priority Elevation to URGENT_DISPLAY
-        try {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 2. Window 32-bit RGBA hardware buffer format & Keep Screen On
+        // 1. Window 32-bit RGBA hardware buffer format & Keep Screen On
         try {
             Window window = getWindow();
             window.setFormat(PixelFormat.RGBA_8888);
@@ -39,13 +32,12 @@ public class MainActivity extends BridgeActivity {
 
         if (this.bridge != null && this.bridge.getWebView() != null) {
             WebView webView = this.bridge.getWebView();
-            webView.clearCache(true);
-            webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+            webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
             
-            // 3. Opaque Black background to skip SurfaceFlinger alpha blending
+            // 2. Opaque Black background to skip SurfaceFlinger alpha blending
             webView.setBackgroundColor(Color.BLACK);
 
-            // 4. Disable Android UI overscroll & scrollbar composite passes
+            // 3. Disable Android UI overscroll & scrollbar composite passes
             webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
             webView.setVerticalScrollBarEnabled(false);
             webView.setHorizontalScrollBarEnabled(false);
@@ -84,10 +76,16 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onStop() {
         super.onStop();
-        if (this.bridge != null && this.bridge.getWebView() != null) {
-            this.bridge.getWebView().evaluateJavascript("window._onAppMinimize && window._onAppMinimize();", null);
-            this.bridge.getWebView().onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        try {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        super.onDestroy();
     }
 
     private void hideSystemUI() {

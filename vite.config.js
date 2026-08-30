@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [viteSingleFile()],
   build: {
     outDir: 'www',
-    emptyOutDir: false,
+    emptyOutDir: true,
     cssCodeSplit: false
   }
 })
