@@ -121,12 +121,16 @@ async function main() {
     expression: `JSON.stringify((function() {
       var btn = document.getElementById("btn-show-settings");
       var sc = document.getElementById("settings-screen");
+      var devBtn = document.getElementById("set-dev-diag-btn");
+      var devRow = document.getElementById("set-dev-diag-row");
       var backBtn = document.getElementById("btn-hide-settings");
       if (btn) btn.click();
       var opened = sc && !sc.classList.contains("hidden");
+      var devRowVisible = devRow && window.getComputedStyle(devRow).display !== "none";
+      var devBtnText = devBtn ? devBtn.textContent : null;
       if (backBtn) backBtn.click();
       var closed = sc && sc.classList.contains("hidden");
-      return { buttonFound: !!btn, opened: opened, closedAfterBack: closed };
+      return { buttonFound: !!btn, opened: opened, devRowVisible: devRowVisible, devBtnText: devBtnText, closedAfterBack: closed };
     })())`
   });
   console.log('4. Settings modal test:', settingsTest.result.result.value);

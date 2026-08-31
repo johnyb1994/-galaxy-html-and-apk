@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace "com.galaxyoutlast.game"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +13,8 @@ android {
         applicationId "com.galaxyoutlast.game"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 34
-        versionName "1.34"
+        versionCode 36
+        versionName "1.36"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -18,10 +24,17 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file('release.keystore')
-            storePassword 'galaxypass'
-            keyAlias 'galaxykey'
-            keyPassword 'galaxypass'
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'] ?: 'release.keystore')
+                storePassword keystoreProperties['storePassword'] ?: System.getenv('KEYSTORE_PASSWORD')
+                keyAlias keystoreProperties['keyAlias'] ?: 'galaxykey'
+                keyPassword keystoreProperties['keyPassword'] ?: System.getenv('KEY_PASSWORD')
+            } else {
+                storeFile file('release.keystore')
+                storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'galaxypass'
+                keyAlias System.getenv('KEY_ALIAS') ?: 'galaxykey'
+                keyPassword System.getenv('KEY_PASSWORD') ?: 'galaxypass'
+            }
         }
     }
     buildTypes {
