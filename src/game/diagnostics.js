@@ -2,10 +2,31 @@
 (function() {
   var triggerLog = window._triggerLog || (window._triggerLog = []);
   window.addTrigger = function(type, detail) {
-    if (!isDevDiagEnabled) return;
     var now = performance.now();
     triggerLog.push({ type: type, detail: detail, time: now });
     if (triggerLog.length > 400) triggerLog.shift();
+
+    // If entering or exiting LevelUp, Upgrade Pick, Pause, Resume, or Game Over:
+    if (type === "LevelUp" || type === "UpgPick" || type === "Pause" || type === "Resume" || type === "GameOver" || type === "Victory" || type === "WaveBanner" || type === "Launch") {
+      resumeGraceUntil = Math.max(resumeGraceUntil, now + 850);
+      lastGameFrameTime = now;
+
+      // Purge any stutter logged in the immediate 450ms before entering pause / level-up transition
+      var cutoff = now - 450;
+      while (devMetrics.stutterLog.length > 0) {
+        var top = devMetrics.stutterLog[0];
+        var entryTime = (top && typeof top === "object") ? top.time : 0;
+        if (entryTime && entryTime >= cutoff) {
+          var removed = devMetrics.stutterLog.shift();
+          devMetrics.stutterCount = Math.max(0, devMetrics.stutterCount - 1);
+          if (removed.causeType && devMetrics.causeStats[removed.causeType]) {
+            devMetrics.causeStats[removed.causeType] = Math.max(0, devMetrics.causeStats[removed.causeType] - 1);
+          }
+        } else {
+          break;
+        }
+      }
+    }
   };
 
   function getRecentTriggers(msWindow) {
@@ -140,7 +161,7 @@
     maxComputeMs: 0,
     avgComputeMs: 0,
     totalComputeMs: 0,
-    causeStats: { vsync: 0, cpu: 0, gc: 0 },
+    causeStats: { vsync: 0, micro: 0, cpu: 0, physics: 0, gc: 0 },
     memTimer: performance.now()
   };
   window.__devMetrics = devMetrics;
@@ -165,10 +186,22 @@
   window.isDevDiagEnabled = isDevDiagEnabled;
   window.devMetrics = devMetrics;
 
-  function isOverlayActive() {
-    const overlayIds = ['up-screen', 'pause-screen', 'start-screen', 'over-screen', 'win-screen', 'settings-screen', 'achievements-screen', 'enc-screen', 'adv-sounds-screen', 'lore-screen'];
-    for (let i = 0; i < overlayIds.length; i++) {
-      const el = document.getElementById(overlayIds[i]);
+  function isModalOrOverlayActive() {
+    const modalIds = [
+      'up-screen',
+      'pause-screen',
+      'start-screen',
+      'over-screen',
+      'win-screen',
+      'settings-screen',
+      'score-screen',
+      'adv-sounds-screen',
+      'enc-screen',
+      'lore-screen',
+      'achievements-screen'
+    ];
+    for (let i = 0; i < modalIds.length; i++) {
+      const el = document.getElementById(modalIds[i]);
       if (el && !el.classList.contains('hidden')) {
         const style = window.getComputedStyle(el);
         if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') return true;
@@ -234,9 +267,9 @@
     devMetrics.gcPauses = 0;
     devMetrics.stutterLog = [];
     devMetrics.maxComputeMs = 0;
-    devMetrics.causeStats = { vsync: 0, cpu: 0, gc: 0 };
+    devMetrics.causeStats = { vsync: 0, micro: 0, cpu: 0, physics: 0, gc: 0 };
     const elLog = document.getElementById("dev-stutter-log");
-    if (elLog) elLog.innerHTML = '<span style="color:#667788;">No active gameplay stutters.</span>';
+    if (elLog) elLog.innerHTML = '<span style="color:#667788;">No active gameplay issues.</span>';
     const elSpikes = document.getElementById("dev-spikes-val") || document.getElementById("diag-stutter-val");
     if (elSpikes) { elSpikes.textContent = "0"; elSpikes.style.color = "#00ffaa"; }
     const elGc = document.getElementById("dev-gc-val");
@@ -257,22 +290,31 @@
     var trig = getRecentTriggers(100);
     var trigStr = trig.length ? trig.join(",") : "None";
     var ent = getEntityStats();
-    var targetHz = (window.w && window.w.displayHz) ? window.w.displayHz : 60;
+    var is120Active = (window.et && window.et.targetFps === "120hz") && (window.w && window.w.displayHz > 90);
+    var targetHz = is120Active ? ((window.w && window.w.displayHz) ? window.w.displayHz : 120) : 60;
+    var targetBudgetMs = (1000 / targetHz).toFixed(1);
 
     var lines = [
       "[DIAGNOSTICS REPORT]",
-      "FPS: " + devMetrics.fps + " (Target: " + targetHz + "Hz) | Frame Compute: avg " + devMetrics.avgComputeMs.toFixed(1) + "ms, max " + devMetrics.maxComputeMs.toFixed(1) + "ms | Interval: " + devMetrics.intervalMs.toFixed(1) + "ms",
-      "Gameplay Spikes: " + tot + " | GC Pauses: " + devMetrics.gcPauses + " | RAM: " + devMetrics.heapUsedMB,
+      "FPS: " + devMetrics.fps + " (Target: " + targetHz + "Hz / " + targetBudgetMs + "ms) | Compute: avg " + devMetrics.avgComputeMs.toFixed(1) + "ms, max " + devMetrics.maxComputeMs.toFixed(1) + "ms | Last Interval: " + devMetrics.intervalMs.toFixed(1) + "ms",
+      "Total Issues Recorded: " + tot + " | GC Pauses: " + devMetrics.gcPauses + " | RAM: " + devMetrics.heapUsedMB,
       "Wave: " + wav + " | Boss: " + bss + " | Entities: " + ent,
-      "Causes: VSync:" + devMetrics.causeStats.vsync + " (" + ((devMetrics.causeStats.vsync / den) * 100).toFixed(0) + "%) CPU:" + devMetrics.causeStats.cpu + " (" + ((devMetrics.causeStats.cpu / den) * 100).toFixed(0) + "%) GC:" + devMetrics.causeStats.gc + " (" + ((devMetrics.causeStats.gc / den) * 100).toFixed(0) + "%)",
+      "Causes Breakdown:",
+      "  • VSync Drops (≥1.35x): " + devMetrics.causeStats.vsync + " (" + ((devMetrics.causeStats.vsync / den) * 100).toFixed(0) + "%)",
+      "  • Micro-Hitches (≥1.18x / Δ≥4ms): " + devMetrics.causeStats.micro + " (" + ((devMetrics.causeStats.micro / den) * 100).toFixed(0) + "%)",
+      "  • Heavy CPU (>58% frame): " + devMetrics.causeStats.cpu + " (" + ((devMetrics.causeStats.cpu / den) * 100).toFixed(0) + "%)",
+      "  • Physics Bursts (2x+): " + devMetrics.causeStats.physics + " (" + ((devMetrics.causeStats.physics / den) * 100).toFixed(0) + "%)",
+      "  • GC Freezes: " + devMetrics.causeStats.gc + " (" + ((devMetrics.causeStats.gc / den) * 100).toFixed(0) + "%)",
       "Recent Triggers (100ms): " + trigStr,
-      "Stutter Log (" + devMetrics.stutterLog.length + " entries):"
+      "Recorded Event Log (" + devMetrics.stutterLog.length + " entries):"
     ];
 
     for (var i = 0; i < devMetrics.stutterLog.length; i++) {
-      lines.push("[" + (i + 1) + "] " + devMetrics.stutterLog[i]);
+      var item = devMetrics.stutterLog[i];
+      var textStr = (item && typeof item === "object") ? item.text : item;
+      lines.push("[" + (i + 1) + "] " + textStr);
     }
-    if (!devMetrics.stutterLog.length) lines.push("No gameplay stutters recorded.");
+    if (!devMetrics.stutterLog.length) lines.push("No gameplay issues recorded.");
     copyReportText(lines.join("\n"));
   }
 
@@ -307,7 +349,8 @@
   }
 
   const originalRAF = window.requestAnimationFrame;
-  let lastFrameTime = performance.now();
+  let lastGameFrameTime = performance.now();
+  let lastGameLoopTick = 0;
   let resumeGraceUntil = performance.now() + 3000;
   const recentComputeWindow = [];
   const fpsFrameTimestamps = [];
@@ -328,7 +371,8 @@
     const h = canvas.height || 40;
     ctx.clearRect(0, 0, w, h);
 
-    const targetHz = (window.w && window.w.displayHz) ? window.w.displayHz : 60;
+    const is120Active = (window.et && window.et.targetFps === "120hz") && (window.w && window.w.displayHz > 90);
+    const targetHz = is120Active ? ((window.w && window.w.displayHz) ? window.w.displayHz : 120) : 60;
     const targetBudgetMs = 1000 / targetHz;
 
     // Determine dynamic max scale based on recent max compute (min 25ms, up to 60ms)
@@ -373,8 +417,8 @@
 
   function handleVisibilityOrFocusResume() {
     const now = performance.now();
-    lastFrameTime = now;
-    resumeGraceUntil = now + 400;
+    lastGameFrameTime = now;
+    resumeGraceUntil = now + 850;
   }
 
   window.addEventListener('visibilitychange', () => {
@@ -388,6 +432,7 @@
   var lastUIUpdateTime = 0;
   var lastPaintTimestamp = 0;
   var accumulatedFrameCompute = 0;
+  var prevInterval = 16.6;
 
   var diagRAF = function(callback) {
     return originalRAF.call(window, function(timestamp) {
@@ -404,115 +449,152 @@
         accumulatedFrameCompute = 0;
       }
 
-      // Execute callback with precision timer
+      // Precision callback duration measurement
       const cbStart = performance.now();
       callback(timestamp);
       const cbEnd = performance.now();
       const cbDuration = (cbEnd - cbStart);
       accumulatedFrameCompute += cbDuration;
 
-      // Only evaluate frame intervals and metrics on the primary game loop tick
-      const gObj = window.w && window.w.G;
-      const interval = now - lastFrameTime;
+      // Track game frame render ticks specifically
+      const curGameTick = (window.w && window.w._gameLoopTick) ? window.w._gameLoopTick : 0;
+      const isGameTick = (curGameTick !== lastGameLoopTick) || (window.w && window.w.G && window.w.G.running);
 
-      // If interval indicates a real frame presentation tick (>= 2ms)
-      if (interval >= 2.0) {
-        lastFrameTime = now;
+      if (isGameTick) {
+        lastGameLoopTick = curGameTick;
+        const interval = now - lastGameFrameTime;
 
-        // Skip massive background pauses (> 500ms) from polluting calculations
-        if (interval < 500.0) {
-          devMetrics.intervalMs = interval;
-          devMetrics.intervalHistory.push(interval);
-          if (devMetrics.intervalHistory.length > 30) devMetrics.intervalHistory.shift();
+        // Valid presentation interval (>= 2ms)
+        if (interval >= 2.0) {
+          lastGameFrameTime = now;
 
-          const computeTime = accumulatedFrameCompute;
-          devMetrics.computeTimeMs = computeTime;
+          // Skip background tab dormancy (> 500ms)
+          if (interval < 500.0) {
+            devMetrics.intervalMs = interval;
+            devMetrics.intervalHistory.push(interval);
+            if (devMetrics.intervalHistory.length > 30) devMetrics.intervalHistory.shift();
 
-          // Maintain rolling 60-frame compute time window
-          recentComputeWindow.push(computeTime);
-          if (recentComputeWindow.length > 60) recentComputeWindow.shift();
-          var sumComp = 0;
-          for (var ci = 0; ci < recentComputeWindow.length; ci++) sumComp += recentComputeWindow[ci];
-          devMetrics.avgComputeMs = sumComp / recentComputeWindow.length;
+            const computeTime = accumulatedFrameCompute;
+            devMetrics.computeTimeMs = computeTime;
 
-          if (computeTime > devMetrics.maxComputeMs) devMetrics.maxComputeMs = computeTime;
+            // Rolling 60-frame compute average
+            recentComputeWindow.push(computeTime);
+            if (recentComputeWindow.length > 60) recentComputeWindow.shift();
+            var sumComp = 0;
+            for (var ci = 0; ci < recentComputeWindow.length; ci++) sumComp += recentComputeWindow[ci];
+            devMetrics.avgComputeMs = sumComp / recentComputeWindow.length;
 
-          // Rolling 1-second FPS calculation
-          fpsFrameTimestamps.push(now);
-          while (fpsFrameTimestamps.length > 0 && (now - fpsFrameTimestamps[0]) > 1000) {
-            fpsFrameTimestamps.shift();
-          }
-          if (fpsFrameTimestamps.length >= 2) {
-            const elapsedWindow = now - fpsFrameTimestamps[0];
-            devMetrics.fps = elapsedWindow > 0 ? Math.round(((fpsFrameTimestamps.length - 1) * 1000) / elapsedWindow) : 60;
-          } else if (window.w && window.w.currentFps) {
-            devMetrics.fps = window.w.currentFps;
-          }
+            if (computeTime > devMetrics.maxComputeMs) devMetrics.maxComputeMs = computeTime;
 
-          // Active combat gameplay state determination
-          const isGameplayActive = gObj && gObj.running && !gObj.over && !gObj.paused && !isOverlayActive() && !gObj.waveTransition;
-          const launchElapsed = window._gameLaunchTime ? (now - window._gameLaunchTime) : (gObj ? (gObj.runTimeMs || 0) : 0);
-          const isPastGracePeriod = isGameplayActive && launchElapsed >= 3000 && now >= resumeGraceUntil;
-
-          // Real-time Memory & GC Tracking
-          let heapDrop = 0, isGC = false, currentHeapMB = 0;
-          if (window.performance && window.performance.memory) {
-            try {
-              currentHeapMB = window.performance.memory.usedJSHeapSize / 1048576;
-              if (devMetrics.lastHeapNum > 0 && (devMetrics.lastHeapNum - currentHeapMB) >= 0.25) {
-                heapDrop = devMetrics.lastHeapNum - currentHeapMB;
-                isGC = true;
-                if (isPastGracePeriod) devMetrics.gcPauses++;
-              }
-              devMetrics.lastHeapNum = currentHeapMB;
-              devMetrics.heapUsedMB = currentHeapMB.toFixed(1) + " MB";
-            } catch(e) {}
-          }
-
-          // Target refresh rate and dynamic frame budget
-          const targetHz = (window.w && window.w.displayHz) ? window.w.displayHz : 60;
-          const targetInterval = 1000 / targetHz;
-
-          // Detect true gameplay lag spikes (dropped VSync or CPU budget overrun)
-          const isDroppedVsync = interval >= (targetInterval * 1.55);
-          const isCpuOverrun = computeTime >= (targetInterval * 1.05);
-
-          if (isPastGracePeriod && (isDroppedVsync || isCpuOverrun)) {
-            devMetrics.stutterCount++;
-
-            let cause = "";
-            if (isGC) {
-              cause = "GC(-" + heapDrop.toFixed(1) + "MB)";
-              devMetrics.causeStats.gc++;
-            } else if (computeTime >= targetInterval * 0.95) {
-              cause = "CPU";
-              devMetrics.causeStats.cpu++;
-            } else {
-              cause = "VSync";
-              devMetrics.causeStats.vsync++;
+            // Rolling 1-second FPS
+            fpsFrameTimestamps.push(now);
+            while (fpsFrameTimestamps.length > 0 && (now - fpsFrameTimestamps[0]) > 1000) {
+              fpsFrameTimestamps.shift();
+            }
+            if (fpsFrameTimestamps.length >= 2) {
+              const elapsedWindow = now - fpsFrameTimestamps[0];
+              devMetrics.fps = elapsedWindow > 0 ? Math.round(((fpsFrameTimestamps.length - 1) * 1000) / elapsedWindow) : 60;
+            } else if (window.w && window.w.currentFps) {
+              devMetrics.fps = window.w.currentFps;
             }
 
-            const inGameTimeEl = document.getElementById("time-lbl");
-            const inGameTime = inGameTimeEl ? inGameTimeEl.textContent.trim() : "0:00";
-            const elWave = document.getElementById("wave-lbl");
-            const wt = elWave ? elWave.textContent.trim().split("\n").join(" ") : ("W" + (gObj ? gObj.wave : "?"));
+            const gObj = window.w && window.w.G;
+            const isModalOpen = isModalOrOverlayActive();
+            const isPausedOrModal = isModalOpen || (gObj && gObj.paused);
 
-            const ent = getEntityStats();
-            const lookbackMs = Math.max(500, Math.round(interval + 200));
-            const rec = getRecentTriggers(lookbackMs);
-            const trigStr = rec.length ? rec.join(",") : "None";
+            // If game is paused or any modal is open, continuously push the grace window forward
+            if (isPausedOrModal) {
+              resumeGraceUntil = Math.max(resumeGraceUntil, now + 850);
+            }
 
-            const touchState = gObj ? (gObj.isDragging ? "TouchDrag" : "TouchIdle") : "NoGame";
-            const waveSubState = gObj ? (gObj.waveTransition ? "WaveTrans" : (gObj.activeBoss ? "BossFight" : "Combat")) : "Idle";
-            const cadence = devMetrics.intervalHistory.slice(-4, -1).map(function(x){ return Math.round(x) + "ms"; }).join(",");
+            const isGameRunning = gObj && gObj.running && !gObj.over && !isPausedOrModal;
+            const launchElapsed = window._gameLaunchTime ? (now - window._gameLaunchTime) : (gObj ? (gObj.runTimeMs || 0) : 0);
+            const isEligibleForCombatProfiling = isGameRunning && launchElapsed >= 3000 && now >= resumeGraceUntil;
 
-            const logEntry = cause + " [" + inGameTime + "] C:" + computeTime.toFixed(1) + "ms I:" + interval.toFixed(1) + "ms | " + wt + " (" + waveSubState + "|" + touchState + ") RAM:" + devMetrics.heapUsedMB + " | Prev:[" + cadence + "] | " + ent + " | Trig:" + trigStr;
-            devMetrics.stutterLog.unshift(logEntry);
-            if (devMetrics.stutterLog.length > 50) devMetrics.stutterLog.pop();
+            // Real-time Memory & GC Tracking
+            let heapDrop = 0, isGC = false, currentHeapMB = 0;
+            if (window.performance && window.performance.memory) {
+              try {
+                currentHeapMB = window.performance.memory.usedJSHeapSize / 1048576;
+                if (devMetrics.lastHeapNum > 0 && (devMetrics.lastHeapNum - currentHeapMB) >= 0.12) {
+                  heapDrop = devMetrics.lastHeapNum - currentHeapMB;
+                  isGC = true;
+                  if (isEligibleForCombatProfiling) devMetrics.gcPauses++;
+                }
+                devMetrics.lastHeapNum = currentHeapMB;
+                devMetrics.heapUsedMB = currentHeapMB.toFixed(1) + " MB";
+              } catch(e) {}
+            }
+
+            // Target display refresh rate and dynamic frame budget
+            const is120Active = (window.et && window.et.targetFps === "120hz") && (window.w && window.w.displayHz > 90);
+            const targetHz = is120Active ? ((window.w && window.w.displayHz) ? window.w.displayHz : 120) : 60;
+            const targetInterval = 1000 / targetHz; // 16.66ms on 60Hz, 8.33ms on 120Hz
+
+            // High-sensitivity multi-tier issue detection for ACTIVE COMBAT
+            const isDroppedVsync = interval >= (targetInterval * 1.35); // >= 22.5ms on 60Hz
+            const intervalDelta = Math.abs(interval - prevInterval);
+            const isMicroStutter = (interval >= targetInterval * 1.18 && interval < targetInterval * 1.35) || (intervalDelta >= targetInterval * 0.30 && interval >= targetInterval * 1.10); // 19.6ms - 22.4ms or 5ms pacing swing
+            const isHeavyCpu = computeTime >= (targetInterval * 0.58); // >= 9.6ms on 60Hz (leaving <7ms for compositor)
+            const subSteps = (window.w && window.w._lastSubSteps) ? window.w._lastSubSteps : 1;
+            const isPhysicsBurst = (subSteps >= 2);
+
+            // Record ONLY during active combat gameplay with bullets and enemies
+            if (isEligibleForCombatProfiling && (isDroppedVsync || isMicroStutter || isHeavyCpu || isPhysicsBurst || (isGC && interval >= targetInterval * 1.10))) {
+              devMetrics.stutterCount++;
+
+              let cause = "";
+              let causeKey = "";
+              if (isGC) {
+                cause = "GC(-" + heapDrop.toFixed(1) + "MB)";
+                causeKey = "gc";
+                devMetrics.causeStats.gc++;
+              } else if (isDroppedVsync) {
+                cause = "VSyncDrop";
+                causeKey = "vsync";
+                devMetrics.causeStats.vsync++;
+              } else if (isMicroStutter) {
+                cause = "MicroStutter";
+                causeKey = "micro";
+                devMetrics.causeStats.micro++;
+              } else if (isHeavyCpu) {
+                cause = "HeavyCPU";
+                causeKey = "cpu";
+                devMetrics.causeStats.cpu++;
+              } else if (isPhysicsBurst) {
+                cause = "PhysicsBurst";
+                causeKey = "physics";
+                devMetrics.causeStats.physics++;
+              } else {
+                cause = "CadenceJitter";
+                causeKey = "micro";
+                devMetrics.causeStats.micro++;
+              }
+
+              const inGameTimeEl = document.getElementById("time-lbl");
+              const inGameTime = inGameTimeEl ? inGameTimeEl.textContent.trim() : "0:00";
+              const elWave = document.getElementById("wave-lbl");
+              const wt = elWave ? elWave.textContent.trim().split("\n").join(" ") : ("W" + (gObj ? gObj.wave : "?"));
+
+              const ent = getEntityStats();
+              const lookbackMs = Math.max(500, Math.round(interval + 200));
+              const rec = getRecentTriggers(lookbackMs);
+              const trigStr = rec.length ? rec.join(",") : "None";
+
+              const touchState = gObj ? (gObj.isDragging ? "Drag" : "Idle") : "NoGame";
+              const waveSubState = gObj ? (gObj.waveTransition ? "WaveTrans" : (gObj.activeBoss ? "BossFight" : "Combat")) : "Idle";
+              const cadence = devMetrics.intervalHistory.slice(-4, -1).map(function(x){ return Math.round(x) + "ms"; }).join(",");
+              const extraInfo = isPhysicsBurst ? (" (" + subSteps + "x steps)") : isMicroStutter ? (" (Δ:" + intervalDelta.toFixed(1) + "ms)") : isHeavyCpu ? (" (Load:" + Math.round((computeTime/targetInterval)*100) + "%)") : "";
+
+              const logEntry = cause + extraInfo + " [" + inGameTime + "] C:" + computeTime.toFixed(1) + "ms I:" + interval.toFixed(1) + "ms | " + wt + " (" + waveSubState + "|" + touchState + ") RAM:" + devMetrics.heapUsedMB + " | Prev:[" + cadence + "] | " + ent + " | Trig:" + trigStr;
+              devMetrics.stutterLog.unshift({ text: logEntry, time: now, causeType: causeKey });
+              if (devMetrics.stutterLog.length > 100) devMetrics.stutterLog.pop();
+            }
+
+            prevInterval = interval;
+            devMetrics.history.push(computeTime);
+            if (devMetrics.history.length > 60) devMetrics.history.shift();
           }
-
-          devMetrics.history.push(computeTime);
-          if (devMetrics.history.length > 60) devMetrics.history.shift();
         }
       }
 
@@ -552,21 +634,21 @@
           if (elFrameTime) {
             const ct = devMetrics.computeTimeMs;
             elFrameTime.textContent = ct.toFixed(1) + " ms";
-            elFrameTime.style.color = ct <= 8.0 ? "#00ffaa" : ct <= 16.0 ? "#ffaa00" : "#ff3366";
+            elFrameTime.style.color = ct <= 8.0 ? "#00ffaa" : ct <= 14.0 ? "#ffaa00" : "#ff3366";
           }
           // 3. INTERVAL
           const elInterval = document.getElementById("dev-interval-val");
           if (elInterval) {
             const itv = devMetrics.intervalMs;
             elInterval.textContent = itv.toFixed(1) + " ms";
-            elInterval.style.color = itv <= 18.0 ? "#00e5ff" : itv <= 24.0 ? "#ffaa00" : "#ff3366";
+            elInterval.style.color = itv <= 18.0 ? "#00e5ff" : itv <= 22.0 ? "#ffaa00" : "#ff3366";
           }
           // 4. RAM (HEAP)
           const elRam = document.getElementById("dev-ram-val");
           if (elRam) {
             elRam.textContent = devMetrics.heapUsedMB;
           }
-          // 5. GAMEPLAY SPIKES
+          // 5. GAMEPLAY SPIKES & HITCHES
           const elSpikes = document.getElementById("dev-spikes-val") || document.getElementById("diag-stutter-val");
           if (elSpikes) {
             elSpikes.textContent = devMetrics.stutterCount;
@@ -582,17 +664,21 @@
           if (sparkCanvas) {
             drawSparkline(sparkCanvas, devMetrics.history);
           }
-          // 8. STUTTER LOG
+          // 8. STUTTER & HITCH LOG
           const elLog = document.getElementById("dev-stutter-log");
           if (elLog) {
             if (devMetrics.stutterLog.length === 0) {
-              elLog.innerHTML = '<span style="color:#667788;">No active gameplay stutters.</span>';
+              elLog.innerHTML = '<span style="color:#667788;">No active gameplay issues.</span>';
             } else {
               elLog.innerHTML = devMetrics.stutterLog.map(function(item, idx) {
-                const isGc = item.indexOf("GC") === 0;
-                const isCpu = item.indexOf("CPU") === 0;
-                const clr = isGc ? "#cc66ff" : (isCpu ? "#ff4466" : "#ffaa00");
-                return '<div style="color:' + clr + ';margin-bottom:2px;">[' + (idx + 1) + '] ' + item + '</div>';
+                var text = (item && typeof item === "object") ? item.text : item;
+                const isGc = text.indexOf("GC") === 0;
+                const isCpu = text.indexOf("HeavyCPU") === 0;
+                const isVsync = text.indexOf("VSyncDrop") === 0;
+                const isPhys = text.indexOf("PhysicsBurst") === 0;
+                const isMicro = text.indexOf("MicroStutter") === 0;
+                const clr = isGc ? "#cc66ff" : (isVsync ? "#ff3366" : (isCpu ? "#ff6644" : (isPhys ? "#ffee44" : (isMicro ? "#00e5ff" : "#ffaa00"))));
+                return '<div style="color:' + clr + ';margin-bottom:2px;font-size:10px;line-height:1.25;">[' + (idx + 1) + '] ' + text + '</div>';
               }).join("");
             }
           }
@@ -617,4 +703,6 @@
   }
 })();
 export {};
+
+
 
