@@ -21,18 +21,49 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         hideSystemUI();
 
-        // 1. Window 32-bit RGBA hardware buffer format & Keep Screen On
+        // 1. Window 32-bit RGBA hardware buffer format, keep screen on, and lock high-performance display mode
         try {
             Window window = getWindow();
             window.setFormat(PixelFormat.RGBA_8888);
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            window.addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                android.view.Display display = getDisplay();
+                if (display != null) {
+                    android.view.Display.Mode[] modes = display.getSupportedModes();
+                    android.view.Display.Mode maxMode = null;
+                    float maxRate = 0;
+                    for (android.view.Display.Mode mode : modes) {
+                        if (mode.getRefreshRate() > maxRate) {
+                            maxRate = mode.getRefreshRate();
+                            maxMode = mode;
+                        }
+                    }
+                    if (maxMode != null) {
+                        WindowManager.LayoutParams params = window.getAttributes();
+                        params.preferredDisplayModeId = maxMode.getModeId();
+                        window.setAttributes(params);
+                    }
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                WindowManager.LayoutParams params = window.getAttributes();
+                params.preferredRefreshRate = 0.0f;
+                window.setAttributes(params);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                window.setSustainedPerformanceMode(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         if (this.bridge != null && this.bridge.getWebView() != null) {
             WebView webView = this.bridge.getWebView();
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            // Use LAYER_TYPE_NONE so Chromium renders directly to the Window surface
+            // without creating an offscreen GPU FBO layer (matches Google Chrome Mobile performance).
+            webView.setLayerType(View.LAYER_TYPE_NONE, null);
             webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
             
             // 2. Opaque Black background to skip SurfaceFlinger alpha blending

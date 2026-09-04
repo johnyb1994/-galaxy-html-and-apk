@@ -104,7 +104,8 @@ const requiredSrcFiles = [
   'src/game/state.js',
   'src/game/weapons.js',
   'src/game/render.js',
-  'src/game/diagnostics.js'
+  'src/game/diagnostics.js',
+  'src/game/testLab.js'
 ];
 requiredSrcFiles.forEach(rel => {
   const full = path.resolve(__dirname, '..', rel);

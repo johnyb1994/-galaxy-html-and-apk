@@ -150,8 +150,88 @@ async function main() {
   });
   console.log('5. Equipment modal test:', eqTest.result.result.value);
 
+  // 5b. Test Test Lab Launch, Spawners & Dock
+  const testLabCheck = await send('Runtime.evaluate', {
+    expression: `JSON.stringify((function() {
+      var labBtn = document.getElementById("btn-show-test-lab");
+      if (!labBtn) return { buttonFound: false };
+      labBtn.click();
+      var g = window.w ? window.w.G : null;
+      var dock = document.getElementById("test-lab-dock");
+      return {
+        buttonFound: true,
+        isTestLab: window.isTestLabActive,
+        godMode: g ? g.godMode : false,
+        shots: g ? g.shots : 0,
+        ring: g ? g.ring : false,
+        dockVisible: dock ? dock.style.display !== "none" : false
+      };
+    })())`
+  });
+  console.log('5b. Test Lab launch test:', testLabCheck.result.result.value);
+
+  await wait(600);
+
+  // Test Pausing, Resuming, Target Refresh switching, and Spawners in Test Lab
+  const testLabInteraction = await send('Runtime.evaluate', {
+    expression: `JSON.stringify((function() {
+      var pauseBtn = document.getElementById("tl-btn-pause");
+      var pauseSc = document.getElementById("pause-screen");
+      var resumeBtn = document.getElementById("btn-resume");
+      var g = window.w ? window.w.G : null;
+      
+      // Test Pause
+      if (pauseBtn) pauseBtn.click();
+      var pausedDuringLab = g ? g.paused : false;
+      var pauseScOpen = pauseSc && !pauseSc.classList.contains("hidden");
+
+      // Test Resume
+      if (resumeBtn) resumeBtn.click();
+      var resumedDuringLab = g ? !g.paused : false;
+      var pauseScClosed = pauseSc && pauseSc.classList.contains("hidden");
+
+      // Test Target Refresh Buttons
+      var fps120 = document.getElementById("tl-fps-120");
+      if (fps120) fps120.click();
+      var target120 = (window.et && window.et.targetFps === "120hz");
+      var fps60 = document.getElementById("tl-fps-60");
+      if (fps60) fps60.click();
+      var target60 = (window.et && window.et.targetFps === "60hz");
+
+      // Test Direct Timing Mode Switches
+      var m2 = document.getElementById("tl-mode-2");
+      if (m2) m2.click();
+      var m3 = document.getElementById("tl-mode-3");
+      if (m3) m3.click();
+      var m5 = document.getElementById("tl-mode-5");
+      if (m5) m5.click();
+      var m1 = document.getElementById("tl-mode-1");
+      if (m1) m1.click();
+      var exitBtn = document.getElementById("tl-btn-exit");
+      if (exitBtn) exitBtn.click();
+
+      return {
+        pausedDuringLab: pausedDuringLab,
+        pauseScOpen: pauseScOpen,
+        resumedDuringLab: resumedDuringLab,
+        pauseScClosed: pauseScClosed,
+        target120Worked: target120,
+        target60Worked: target60,
+        timingMode2Available: !!m2,
+        timingMode3Available: !!m3,
+        timingMode5Available: !!m5,
+        timingMode1Available: !!m1,
+        exitReturned: !window.isTestLabActive
+      };
+    })())`
+  });
+  console.log('5c. Test Lab pause, refresh rate & spawner test:', testLabInteraction.result.result.value);
+
+  await wait(400);
+
   // Take screenshot of Main Menu
   const ssMenu = await send('Page.captureScreenshot', { format: 'png' });
+
   const fs = require('fs');
   fs.writeFileSync('menu_screenshot.png', Buffer.from(ssMenu.result.data, 'base64'));
   console.log('📸 Main menu screenshot saved to: galaxy_apk/menu_screenshot.png');

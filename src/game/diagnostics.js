@@ -161,7 +161,7 @@
     maxComputeMs: 0,
     avgComputeMs: 0,
     totalComputeMs: 0,
-    causeStats: { vsync: 0, micro: 0, cpu: 0, physics: 0, gc: 0 },
+    causeStats: { vsync: 0, micro: 0, cpu: 0, physics: 0, freeze: 0, gc: 0 },
     memTimer: performance.now()
   };
   window.__devMetrics = devMetrics;
@@ -267,7 +267,7 @@
     devMetrics.gcPauses = 0;
     devMetrics.stutterLog = [];
     devMetrics.maxComputeMs = 0;
-    devMetrics.causeStats = { vsync: 0, micro: 0, cpu: 0, physics: 0, gc: 0 };
+    devMetrics.causeStats = { vsync: 0, micro: 0, cpu: 0, physics: 0, freeze: 0, gc: 0 };
     const elLog = document.getElementById("dev-stutter-log");
     if (elLog) elLog.innerHTML = '<span style="color:#667788;">No active gameplay issues.</span>';
     const elSpikes = document.getElementById("dev-spikes-val") || document.getElementById("diag-stutter-val");
@@ -300,10 +300,11 @@
       "Total Issues Recorded: " + tot + " | GC Pauses: " + devMetrics.gcPauses + " | RAM: " + devMetrics.heapUsedMB,
       "Wave: " + wav + " | Boss: " + bss + " | Entities: " + ent,
       "Causes Breakdown:",
+      "  • Pacing Freezes (0x step): " + (devMetrics.causeStats.freeze || 0) + " (" + (((devMetrics.causeStats.freeze || 0) / den) * 100).toFixed(0) + "%)",
+      "  • Physics Bursts (2x+ steps): " + (devMetrics.causeStats.physics || 0) + " (" + (((devMetrics.causeStats.physics || 0) / den) * 100).toFixed(0) + "%)",
       "  • VSync Drops (≥1.35x): " + devMetrics.causeStats.vsync + " (" + ((devMetrics.causeStats.vsync / den) * 100).toFixed(0) + "%)",
       "  • Micro-Hitches (≥1.18x / Δ≥4ms): " + devMetrics.causeStats.micro + " (" + ((devMetrics.causeStats.micro / den) * 100).toFixed(0) + "%)",
       "  • Heavy CPU (>58% frame): " + devMetrics.causeStats.cpu + " (" + ((devMetrics.causeStats.cpu / den) * 100).toFixed(0) + "%)",
-      "  • Physics Bursts (2x+): " + devMetrics.causeStats.physics + " (" + ((devMetrics.causeStats.physics / den) * 100).toFixed(0) + "%)",
       "  • GC Freezes: " + devMetrics.causeStats.gc + " (" + ((devMetrics.causeStats.gc / den) * 100).toFixed(0) + "%)",
       "Recent Triggers (100ms): " + trigStr,
       "Recorded Event Log (" + devMetrics.stutterLog.length + " entries):"
@@ -532,43 +533,56 @@
             const targetInterval = 1000 / targetHz; // 16.66ms on 60Hz, 8.33ms on 120Hz
 
             // High-sensitivity multi-tier issue detection for ACTIVE COMBAT
+            const subSteps = (window.w && typeof window.w._lastSubSteps !== "undefined") ? window.w._lastSubSteps : 1;
+            const isPhysicsFreeze = (subSteps === 0);
+            const isPhysicsBurst = (subSteps >= 2);
             const isDroppedVsync = interval >= (targetInterval * 1.35); // >= 22.5ms on 60Hz
             const intervalDelta = Math.abs(interval - prevInterval);
             const isMicroStutter = (interval >= targetInterval * 1.18 && interval < targetInterval * 1.35) || (intervalDelta >= targetInterval * 0.30 && interval >= targetInterval * 1.10); // 19.6ms - 22.4ms or 5ms pacing swing
             const isHeavyCpu = computeTime >= (targetInterval * 0.58); // >= 9.6ms on 60Hz (leaving <7ms for compositor)
-            const subSteps = (window.w && window.w._lastSubSteps) ? window.w._lastSubSteps : 1;
-            const isPhysicsBurst = (subSteps >= 2);
 
             // Record ONLY during active combat gameplay with bullets and enemies
-            if (isEligibleForCombatProfiling && (isDroppedVsync || isMicroStutter || isHeavyCpu || isPhysicsBurst || (isGC && interval >= targetInterval * 1.10))) {
+            if (isEligibleForCombatProfiling && (isPhysicsFreeze || isPhysicsBurst || isDroppedVsync || isMicroStutter || isHeavyCpu || (isGC && interval >= targetInterval * 1.10))) {
               devMetrics.stutterCount++;
 
               let cause = "";
               let causeKey = "";
+              let extraInfo = "";
+
               if (isGC) {
                 cause = "GC(-" + heapDrop.toFixed(1) + "MB)";
                 causeKey = "gc";
                 devMetrics.causeStats.gc++;
-              } else if (isDroppedVsync) {
-                cause = "VSyncDrop";
-                causeKey = "vsync";
-                devMetrics.causeStats.vsync++;
-              } else if (isMicroStutter) {
-                cause = "MicroStutter";
-                causeKey = "micro";
-                devMetrics.causeStats.micro++;
-              } else if (isHeavyCpu) {
-                cause = "HeavyCPU";
-                causeKey = "cpu";
-                devMetrics.causeStats.cpu++;
+              } else if (isPhysicsFreeze) {
+                cause = "PacingFreeze";
+                causeKey = "freeze";
+                devMetrics.causeStats.freeze++;
+                extraInfo = " (0x step - duplicate frame)";
               } else if (isPhysicsBurst) {
                 cause = "PhysicsBurst";
                 causeKey = "physics";
                 devMetrics.causeStats.physics++;
+                extraInfo = " (" + subSteps + "x steps - snap)";
+              } else if (isDroppedVsync) {
+                cause = "VSyncDrop";
+                causeKey = "vsync";
+                devMetrics.causeStats.vsync++;
+                extraInfo = " (Δ:" + intervalDelta.toFixed(1) + "ms)";
+              } else if (isHeavyCpu) {
+                cause = "HeavyCPU";
+                causeKey = "cpu";
+                devMetrics.causeStats.cpu++;
+                extraInfo = " (Load:" + Math.round((computeTime/targetInterval)*100) + "%)";
+              } else if (isMicroStutter) {
+                cause = "MicroStutter";
+                causeKey = "micro";
+                devMetrics.causeStats.micro++;
+                extraInfo = " (Δ:" + intervalDelta.toFixed(1) + "ms)";
               } else {
                 cause = "CadenceJitter";
                 causeKey = "micro";
                 devMetrics.causeStats.micro++;
+                extraInfo = " (Δ:" + intervalDelta.toFixed(1) + "ms)";
               }
 
               const inGameTimeEl = document.getElementById("time-lbl");
@@ -584,7 +598,6 @@
               const touchState = gObj ? (gObj.isDragging ? "Drag" : "Idle") : "NoGame";
               const waveSubState = gObj ? (gObj.waveTransition ? "WaveTrans" : (gObj.activeBoss ? "BossFight" : "Combat")) : "Idle";
               const cadence = devMetrics.intervalHistory.slice(-4, -1).map(function(x){ return Math.round(x) + "ms"; }).join(",");
-              const extraInfo = isPhysicsBurst ? (" (" + subSteps + "x steps)") : isMicroStutter ? (" (Δ:" + intervalDelta.toFixed(1) + "ms)") : isHeavyCpu ? (" (Load:" + Math.round((computeTime/targetInterval)*100) + "%)") : "";
 
               const logEntry = cause + extraInfo + " [" + inGameTime + "] C:" + computeTime.toFixed(1) + "ms I:" + interval.toFixed(1) + "ms | " + wt + " (" + waveSubState + "|" + touchState + ") RAM:" + devMetrics.heapUsedMB + " | Prev:[" + cadence + "] | " + ent + " | Trig:" + trigStr;
               devMetrics.stutterLog.unshift({ text: logEntry, time: now, causeType: causeKey });
@@ -673,11 +686,12 @@
               elLog.innerHTML = devMetrics.stutterLog.map(function(item, idx) {
                 var text = (item && typeof item === "object") ? item.text : item;
                 const isGc = text.indexOf("GC") === 0;
-                const isCpu = text.indexOf("HeavyCPU") === 0;
-                const isVsync = text.indexOf("VSyncDrop") === 0;
+                const isFreeze = text.indexOf("PacingFreeze") === 0;
                 const isPhys = text.indexOf("PhysicsBurst") === 0;
+                const isVsync = text.indexOf("VSyncDrop") === 0;
+                const isCpu = text.indexOf("HeavyCPU") === 0;
                 const isMicro = text.indexOf("MicroStutter") === 0;
-                const clr = isGc ? "#cc66ff" : (isVsync ? "#ff3366" : (isCpu ? "#ff6644" : (isPhys ? "#ffee44" : (isMicro ? "#00e5ff" : "#ffaa00"))));
+                const clr = isGc ? "#cc66ff" : (isFreeze ? "#ff00bb" : (isPhys ? "#ffee44" : (isVsync ? "#ff3366" : (isCpu ? "#ff6644" : (isMicro ? "#00e5ff" : "#ffaa00")))));
                 return '<div style="color:' + clr + ';margin-bottom:2px;font-size:10px;line-height:1.25;">[' + (idx + 1) + '] ' + text + '</div>';
               }).join("");
             }
