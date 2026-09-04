@@ -247,8 +247,8 @@ canvas#c.hdr-mode {
 }
 .eq-square.banned {
   border: 1px solid #ff2244 !important;
-  background: rgba(45, 5, 10, 0.85) !important;
-  box-shadow: 0 0 6px rgba(255, 34, 68, 0.45) !important;
+  background: rgba(0, 10, 20, 0.75) !important;
+  box-shadow: 0 0 5px rgba(255, 34, 68, 0.35) !important;
 }
 .eq-square.banned .eq-lvl {
   color: #ff3344 !important;
@@ -258,8 +258,8 @@ canvas#c.hdr-mode {
 }
 .eq-square.banned .eq-icon img,
 .eq-square.banned img.wpn-icon-img {
-  filter: grayscale(0.4) sepia(0.5) hue-rotate(310deg) saturate(1.8) brightness(0.85) !important;
-  opacity: 0.8 !important;
+  filter: none !important;
+  opacity: 1 !important;
 }
 .eq-square .eq-icon,
 .eq-icon {
@@ -1666,7 +1666,7 @@ input[type=range]::-moz-range-thumb {
   justify-content: center;
   position: relative;
   margin: 15px 0;
-  padding: 16px 0;
+  padding: 24px 0;
   background: #ff003314;
   box-shadow: inset 0 0 20px #f033;
 }
@@ -1726,7 +1726,7 @@ input[type=range]::-moz-range-thumb {
   z-index: 3;
   line-height: 1.2;
   margin-top: 4px;
-  margin-bottom: 24px;
+  margin-bottom: 38px;
   text-align: center;
   white-space: nowrap;
 }
