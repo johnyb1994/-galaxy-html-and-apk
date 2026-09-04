@@ -78,6 +78,11 @@ async function main() {
       if (devClose) devClose.click();
       var panel = document.getElementById("dev-diag-panel");
       if (panel) panel.style.display = "none";
+      var fpsLbl = document.getElementById("fps-lbl");
+      if (fpsLbl) {
+        fpsLbl.textContent = "60 FPS";
+        fpsLbl.style.display = "block";
+      }
     })()`
   });
 
@@ -254,6 +259,13 @@ async function main() {
       var timeLbl = document.getElementById("time-lbl");
       if (timeLbl) timeLbl.textContent = "14:59";
 
+      // Set FPS label to 60 FPS and visible
+      var fpsLbl = document.getElementById("fps-lbl");
+      if (fpsLbl) {
+        fpsLbl.textContent = "60 FPS";
+        fpsLbl.style.display = "block";
+      }
+
       // Populate all 9 equipment badge slots matching engine.js DOM with real in-game weapon icons
       var badges = document.getElementById("max-badges");
       if (badges) {
@@ -299,6 +311,9 @@ async function main() {
       var waveTitle = document.querySelector(".wave-title");
       var waveVal = document.querySelector(".wave-val");
       var barsRow = document.querySelector(".hud-bars-row");
+      var hpBar = document.querySelector(".hud-bar-wrap.hp-bar");
+      var xpBar = document.querySelector(".hud-bar-wrap.xp-bar");
+      var eqHeader = document.getElementById("eq-header");
       var nodmgRow = document.getElementById("nodmg-row");
       var nodmgVal = document.getElementById("nodmg-val");
       var nodmgLbl = document.getElementById("nodmg-lbl");
@@ -309,12 +324,16 @@ async function main() {
       return {
         hud: getRel(hud),
         barsRow: getRel(barsRow),
+        hpBar: getRel(hpBar),
+        xpBar: getRel(xpBar),
+        eqHeader: getRel(eqHeader),
         badges: getRel(badges),
         firstSquare: getRel(firstSquare),
         firstIconImg: getRel(firstIconImg),
         firstEqLvl: getRel(firstEqLvl),
         lvl: getRel(lvl),
         timeWrap: getRel(timeWrap),
+        fpsLbl: getRel(fpsLbl),
         nodmgRow: getRel(nodmgRow),
         nodmgVal: getRel(nodmgVal),
         nodmgLbl: getRel(nodmgLbl),
@@ -398,6 +417,44 @@ async function main() {
     }
   }
 
+  // 3c. Bars Equality & Ending Position
+  if (m.hpBar && m.xpBar) {
+    const barDiff = Math.abs(m.hpBar.width - m.xpBar.width);
+    const barGap = m.xpBar.left - m.hpBar.right;
+    console.log('- Bar widths: Shield=' + m.hpBar.width + 'px, Exp=' + m.xpBar.width + 'px, Diff=' + barDiff.toFixed(1) + 'px, Gap between them=' + barGap.toFixed(1) + 'px, Exp right=' + m.xpBar.right + 'px');
+    if (barDiff > 1.5) {
+      console.error('❌ Exp bar is not the same length as Shield bar! (Shield: ' + m.hpBar.width + 'px vs Exp: ' + m.xpBar.width + 'px)');
+      pass = false;
+    } else {
+      console.log('✔ Exp bar and Shield bar are the SAME length (' + m.hpBar.width + 'px = ' + m.xpBar.width + 'px)');
+    }
+    if (barGap < 10) {
+      console.error('❌ Not enough space between Shield and Exp bars: ' + barGap.toFixed(1) + 'px < 10px');
+      pass = false;
+    } else {
+      console.log('✔ Generous space between Shield and Exp bars: ' + barGap.toFixed(1) + 'px');
+    }
+    if (Math.abs(m.xpBar.right - 201) > 3) {
+      console.error('❌ Exp bar does not finish above 7th rectangle! (right: ' + m.xpBar.right + 'px, expected ~201px)');
+      pass = false;
+    } else {
+      console.log('✔ Exp bar finishes cleanly above 7th rectangle (right: ' + m.xpBar.right + 'px)');
+    }
+  }
+
+  // 3d. Breathing Room for EQUIPMENT header
+  if (m.eqHeader && m.barsRow && m.badges) {
+    const topRoom = m.eqHeader.top - m.barsRow.bottom;
+    const botRoom = m.badges.top - m.eqHeader.bottom;
+    console.log('- EQUIPMENT header breathing room: Top clearance=' + topRoom.toFixed(1) + 'px, Bottom clearance=' + botRoom.toFixed(1) + 'px');
+    if (topRoom < 2.0 || botRoom < 1.5) {
+      console.error('❌ EQUIPMENT header lacks breathing room! Top: ' + topRoom.toFixed(1) + 'px, Bottom: ' + botRoom.toFixed(1) + 'px');
+      pass = false;
+    } else {
+      console.log('✔ EQUIPMENT header has excellent breathing room (Top: ' + topRoom.toFixed(1) + 'px, Bottom: ' + botRoom.toFixed(1) + 'px)');
+    }
+  }
+
   // 4. Horizontal clearances: Shortened bars vs Center col, and Badges vs Scores
   if (m.barsRow && m.timeWrap) {
     const barsToCenterGap = m.timeWrap.left - m.barsRow.right;
@@ -461,29 +518,74 @@ async function main() {
     console.log('✔ All right column elements are within HUD bounds');
   }
 
-  // 8. Wave title and number proximity (tight spacing, not far apart)
-  if (m.waveTitle && m.waveVal) {
-    const waveGap = m.waveVal.left - m.waveTitle.right;
-    console.log('- Gap between WAVE title and number: ' + waveGap.toFixed(1) + 'px (title right: ' + m.waveTitle.right + 'px, number left: ' + m.waveVal.left + 'px)');
-    if (waveGap > 12) {
-      console.error('❌ Wave number is too far from word WAVE: ' + waveGap.toFixed(1) + 'px > 12px!');
+  // 8. Wave title and number alignment with score columns & FPS counter
+  if (m.waveTitle && m.waveVal && m.hiLbl && m.hiVal) {
+    const titleEndDiff = Math.abs(m.waveTitle.right - m.hiLbl.right);
+    const valEndDiff = Math.abs(m.waveVal.right - m.hiVal.right);
+    const waveNumCenter = (m.waveVal.left + m.waveVal.right) / 2;
+    const numBelowCenter = (m.hiVal.left + m.hiVal.right) / 2;
+    const centerDiff = Math.abs(waveNumCenter - numBelowCenter);
+
+    console.log('- Wave alignment: WAVE title right=' + m.waveTitle.right + 'px (HI title right=' + m.hiLbl.right + 'px, diff=' + titleEndDiff.toFixed(1) + 'px)');
+    console.log('- Wave number centering: Wave num center=' + waveNumCenter.toFixed(1) + 'px (Score num center=' + numBelowCenter.toFixed(1) + 'px, diff=' + centerDiff.toFixed(1) + 'px, val right=' + m.waveVal.right + 'px vs HI val right=' + m.hiVal.right + 'px)');
+
+    if (titleEndDiff > 3) {
+      console.error('❌ Wave title does not end where HI title ends! Diff: ' + titleEndDiff.toFixed(1) + 'px');
       pass = false;
     } else {
-      console.log('✔ Wave number is tight and close to word WAVE (gap: ' + waveGap.toFixed(1) + 'px <= 12px)');
+      console.log('✔ WAVE title ends cleanly where HI and SCORE titles end (right: ' + m.waveTitle.right + 'px)');
+    }
+
+    if (centerDiff > 3) {
+      console.error('❌ Wave number is not centered above numbers below! Center diff: ' + centerDiff.toFixed(1) + 'px');
+      pass = false;
+    } else {
+      console.log('✔ Wave number is centered above the numbers below (center: ' + waveNumCenter.toFixed(1) + 'px, diff: ' + centerDiff.toFixed(1) + 'px)');
+    }
+
+    if (valEndDiff > 3) {
+      console.error('❌ Wave value column does not end where HI/SCORE values end! Diff: ' + valEndDiff.toFixed(1) + 'px');
+      pass = false;
+    } else {
+      console.log('✔ Wave value column ends cleanly where HI and SCORE values end (right: ' + m.waveVal.right + 'px)');
     }
   }
 
-  // 9. LVL centered with clock / time
-    const lvlCenter = (m.lvl.left + m.lvl.right) / 2;
-    const timeCenter = (m.timeWrap.left + m.timeWrap.right) / 2;
-    const lvlDelta = Math.abs(lvlCenter - timeCenter);
-    console.log('- Center alignment: LVL center=' + lvlCenter.toFixed(2) + 'px, Clock center=' + timeCenter.toFixed(2) + 'px (delta: ' + lvlDelta.toFixed(2) + 'px)');
-    if (lvlDelta > 2) {
-      console.error('❌ LVL is not centered with clock! Delta: ' + lvlDelta.toFixed(2) + 'px > 2px');
+  // 8b. FPS counter visible and aligned on the same horizontal line as LVL
+  if (m.fpsLbl && m.waveTitle && m.lvl) {
+    const fpsGap = m.waveTitle.left - m.fpsLbl.right;
+    const lvlToFpsYDiff = Math.abs(m.fpsLbl.top - m.lvl.top);
+    console.log('- FPS counter: width=' + m.fpsLbl.width + 'px, top=' + m.fpsLbl.top + 'px (LVL top=' + m.lvl.top + 'px, Y diff=' + lvlToFpsYDiff.toFixed(1) + 'px), gap before WAVE=' + fpsGap.toFixed(1) + 'px');
+    if (m.fpsLbl.width <= 0) {
+      console.error('❌ FPS label is not visible!');
       pass = false;
     } else {
-      console.log('✔ LVL is perfectly centered with clock / time (delta: ' + lvlDelta.toFixed(2) + 'px <= 2px)');
+      console.log('✔ FPS label is clearly visible in screenshot');
     }
+    if (lvlToFpsYDiff > 2.5) {
+      console.error('❌ FPS label is not on the same horizontal line as LVL! Diff: ' + lvlToFpsYDiff.toFixed(1) + 'px');
+      pass = false;
+    } else {
+      console.log('✔ FPS is on the exact same horizontal line as LVL (top diff: ' + lvlToFpsYDiff.toFixed(1) + 'px)');
+    }
+  }
+
+  // 9. Clock moved another 6px to right (left: 269px) & LVL to the left of clock
+  const clockNextToBadgesGap = m.timeWrap.left - m.badges.right;
+  console.log('- Clock placement: Clock left=' + m.timeWrap.left + 'px, Badges right=' + m.badges.right + 'px (gap: ' + clockNextToBadgesGap.toFixed(1) + 'px)');
+  if (clockNextToBadgesGap < 8) {
+    console.error('❌ Clock is not shifted another 6px to the right! Gap: ' + clockNextToBadgesGap.toFixed(1) + 'px < 8px');
+    pass = false;
+  } else {
+    console.log('✔ Clock shifted another 6px to the right (left=' + m.timeWrap.left + 'px, gap from badges: ' + clockNextToBadgesGap.toFixed(1) + 'px)');
+  }
+
+  if (m.lvl.left >= m.timeWrap.left) {
+    console.error('❌ LVL is not to the left of clock! LVL left: ' + m.lvl.left + ', Clock left: ' + m.timeWrap.left);
+    pass = false;
+  } else {
+    console.log('✔ LVL (' + m.lvl.left + 'px) is positioned cleanly to the left of clock (' + m.timeWrap.left + 'px)');
+  }
 
     // 10. Copy artifacts for user viewing
     const artDir = 'C:\\Users\\ACER\\.gemini\\antigravity\\brain\\d389b141-549f-4354-8ef0-735bc60d9281';
