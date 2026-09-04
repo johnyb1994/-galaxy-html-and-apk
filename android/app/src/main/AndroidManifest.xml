@@ -4,7 +4,6 @@
     <application
         android:allowBackup="false"
         android:hardwareAccelerated="true"
-        android:largeHeap="true"
         android:appCategory="game"
         android:isGame="true"
         android:icon="@mipmap/ic_launcher"
