@@ -255,24 +255,60 @@ async function main() {
 
   await wait(2000);
 
+  // Close dev diagnostics completely so it never overlaps the HUD in screenshots
+  await send('Runtime.evaluate', {
+    expression: `(function() {
+      var devClose = document.getElementById("dev-close-btn");
+      if (devClose) devClose.click();
+      var panel = document.getElementById("dev-diag-panel");
+      if (panel) panel.style.display = "none";
+    })()`
+  });
+  await wait(300);
+
   // Take screenshot of Active Gameplay
   const ssGame = await send('Page.captureScreenshot', { format: 'png' });
   fs.writeFileSync('gameplay_screenshot.png', Buffer.from(ssGame.result.data, 'base64'));
   console.log('📸 Gameplay screenshot saved to: galaxy_apk/gameplay_screenshot.png');
 
-  // Visual layout check
+  // Take high-resolution close-up crop of the HUD header
+  const ssHud = await send('Page.captureScreenshot', {
+    format: 'png',
+    clip: { x: 0, y: 0, width: 433, height: 120, scale: 2 }
+  });
+  fs.writeFileSync('hud_closeup.png', Buffer.from(ssHud.result.data, 'base64'));
+  console.log('📸 HUD close-up screenshot saved to: galaxy_apk/hud_closeup.png');
+
+  // Visual layout check & HUD metrics
   const visualLayout = await send('Runtime.evaluate', {
     expression: `JSON.stringify((function() {
       var cv = document.getElementById("canvas");
       var diag = document.getElementById("dev-diag-panel");
-      var btn = document.getElementById("btn-start");
+      var hud = document.getElementById("hud");
+      var hudRect = hud ? hud.getBoundingClientRect() : null;
+      var lvl = document.getElementById("lvl-lbl");
+      var lvlRect = lvl ? lvl.getBoundingClientRect() : null;
+      var badges = document.getElementById("max-badges");
+      var badgesRect = badges ? badges.getBoundingClientRect() : null;
+      var scoreRow = document.getElementById("score-row");
+      var scoreRect = scoreRow ? scoreRow.getBoundingClientRect() : null;
+      var hiRow = document.getElementById("hi-row");
+      var hiRect = hiRow ? hiRow.getBoundingClientRect() : null;
+      var timeWrap = document.getElementById("time-wrap");
+      var timeRect = timeWrap ? timeWrap.getBoundingClientRect() : null;
       return {
         canvas: cv ? { width: cv.width, height: cv.height, clientWidth: cv.clientWidth, clientHeight: cv.clientHeight, display: getComputedStyle(cv).display } : null,
-        diagPanel: diag ? { display: getComputedStyle(diag).display, position: getComputedStyle(diag).position, zIndex: getComputedStyle(diag).zIndex } : null
+        diagPanel: diag ? { display: getComputedStyle(diag).display, position: getComputedStyle(diag).position, zIndex: getComputedStyle(diag).zIndex } : null,
+        hud: hudRect ? { top: Math.round(hudRect.top), bottom: Math.round(hudRect.bottom), height: Math.round(hudRect.height), padTop: getComputedStyle(hud).paddingTop } : null,
+        lvl: lvlRect ? { top: Math.round(lvlRect.top), bottom: Math.round(lvlRect.bottom), left: Math.round(lvlRect.left), height: Math.round(lvlRect.height) } : null,
+        badges: badgesRect ? { top: Math.round(badgesRect.top), bottom: Math.round(badgesRect.bottom), left: Math.round(badgesRect.left), width: Math.round(badgesRect.width), height: Math.round(badgesRect.height) } : null,
+        scoreRow: scoreRect ? { top: Math.round(scoreRect.top), bottom: Math.round(scoreRect.bottom), left: Math.round(scoreRect.left), width: Math.round(scoreRect.width) } : null,
+        hiRow: hiRect ? { top: Math.round(hiRect.top), bottom: Math.round(hiRect.bottom), left: Math.round(hiRect.left), width: Math.round(hiRect.width) } : null,
+        timeWrap: timeRect ? { top: Math.round(timeRect.top), bottom: Math.round(timeRect.bottom), left: Math.round(timeRect.left), width: Math.round(timeRect.width) } : null
       };
-    })())`
+    })(), null, 2)`
   });
-  console.log('📐 Visual layout metrics:', visualLayout?.result?.result?.value);
+  console.log('📐 Visual layout metrics:\n', visualLayout?.result?.result?.value);
 
   // Close tab
   await send('Page.close');

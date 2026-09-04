@@ -144,7 +144,7 @@ export function launchTestLab() {
 
       // Ensure top-right wave label displays BOSS 9
       const waveLbl = document.getElementById('wave-lbl');
-      if (waveLbl) waveLbl.innerHTML = 'BOSS<br>9';
+      if (waveLbl) waveLbl.innerHTML = '<span class="wave-title">BOSS</span><span class="wave-val">9</span>';
 
       // Ensure Boss Bar displays BOSS 9
       const bbWrap = document.getElementById('boss-bar-wrap');
