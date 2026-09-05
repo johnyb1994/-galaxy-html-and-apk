@@ -1,15 +1,18 @@
 {
   "name": "galaxy-outlast",
-  "version": "1.51.0",
+  "version": "1.52.0",
   "description": "Galaxy Outlast Mobile Game",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build && node scripts/sync-onedrive.cjs",
+    "sync": "node scripts/sync-onedrive.cjs",
+    "sync:watch": "node scripts/sync-onedrive.cjs --watch",
+    "build:apk": "npx cap sync android && gradlew.bat -p android assembleRelease && node scripts/sync-onedrive.cjs",
     "preview": "vite preview",
     "test": "node scripts/verify.cjs && node scripts/test_in_headless_chrome.cjs",
     "test:browser": "node scripts/test_in_headless_chrome.cjs",
-    "check": "vite build && node scripts/verify.cjs && node scripts/test_in_headless_chrome.cjs"
+    "check": "npm run build && node scripts/verify.cjs && node scripts/test_in_headless_chrome.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.1",

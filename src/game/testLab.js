@@ -1,8 +1,17 @@
-// src/game/testLab.js - Streamlined Test Environment (Authentic Boss 9 Duel & Frame Timing Controls)
+// src/game/testLab.js - Streamlined Test Environment (10 Boss Duels & 30 Sound Cues Audition)
 import { al } from './bosses.js';
+import {
+  bossAudioVariants,
+  bossAudioVariantNames,
+  getBossCueVariant,
+  setBossCueVariant,
+  playBossWarnSfx,
+  stopBossWarnSfx
+} from './audio.js';
 
 let isTestLabActive = false;
-let timingMode = 'mode1_clamped60'; // 'mode1_clamped60' | 'mode2_smooth_dt' | 'mode3_fixed_accumulator' | 'mode4_uncapped_native'
+let testLabSelectedBoss = 0; // 0 to 9 (Boss 1 to Boss 10)
+let timingMode = 'mode1_clamped60'; // 'mode1_clamped60' | 'mode2_smooth_dt' | 'mode3_fixed_accumulator' | 'mode4_uncapped_native' | 'mode5_30hz_interpolated'
 let dockMinimized = false;
 let lastTelemetryUpdate = 0;
 
@@ -40,6 +49,10 @@ export function getTimingMode() {
 export function setTimingMode(mode) {
   timingMode = mode;
   updateDockUI();
+}
+
+export function getSelectedTestLabBoss() {
+  return testLabSelectedBoss;
 }
 
 /**
@@ -80,7 +93,78 @@ export function applyMaxPlayerWeapons(g) {
 }
 
 /**
- * Launch Test Lab: Authentic Boss Mode at Boss 9
+ * Switch active boss in Test Lab to any of the 10 bosses (0 to 9)
+ */
+export function switchTestLabBoss(bossIndex) {
+  testLabSelectedBoss = Math.max(0, Math.min(9, parseInt(bossIndex, 10) || 0));
+  const g = (window.w && window.w.G) ? window.w.G : null;
+  if (!g) return;
+
+  g.bossMode = true;
+  g.wave = (testLabSelectedBoss + 1) * 3;
+  g.waveTransition = false;
+  g._pendingWave = false;
+  g._upgradeQueue = 0;
+
+  // Clean out any leftover entities
+  if (g.bullets) g.bullets.length = 0;
+  if (g.playerBullets) g.playerBullets.length = 0;
+  if (g.enemyBullets) g.enemyBullets.length = 0;
+  if (g.enemies) g.enemies.length = 0;
+  if (g.parts) g.parts.length = 0;
+  if (g.pickups) g.pickups.length = 0;
+  g.activeBoss = null;
+
+  // Cancel any wave banner so it doesn't wipe the boss wave
+  if (window.w) {
+    window.w._waveBanner = null;
+  }
+
+  // Apply Max Weapons & God Mode to Player
+  applyMaxPlayerWeapons(g);
+
+  // Spawn authentic boss using official game engine Bv((bossIndex+1)*3, al)
+  if (typeof window.Bv === 'function') {
+    window.Bv(g.wave, al);
+  }
+
+  // Mark boss invulnerable so it never dies during testing
+  if (g.activeBoss) {
+    g.activeBoss.invulnerable = true;
+    g.activeBoss.chp = g.activeBoss.mhp;
+    g.activeBoss.alive = true;
+  }
+
+  // Ensure top-right wave label displays BOSS N
+  const waveLbl = document.getElementById('wave-lbl');
+  if (waveLbl) waveLbl.innerHTML = `<span class="wave-title">BOSS</span><span class="wave-val">${testLabSelectedBoss + 1}</span>`;
+
+  // Ensure Boss Bar displays BOSS N
+  const bossDef = al[testLabSelectedBoss];
+  const bbWrap = document.getElementById('boss-bar-wrap');
+  const bbName = document.getElementById('boss-name-lbl');
+  const bbFill = document.getElementById('boss-bar-fill');
+  const bbVal = document.getElementById('boss-bar-val');
+  if (bbWrap) bbWrap.classList.add('show');
+  if (bbName) bbName.textContent = `${bossDef ? bossDef.name : ('BOSS ' + (testLabSelectedBoss + 1))} (INVULNERABLE)`;
+  if (bbFill) bbFill.style.width = '100%';
+  if (bbVal) bbVal.textContent = 'INVULNERABLE';
+
+  updateDockUI();
+}
+
+/**
+ * Trigger active boss attack charge (1200ms visual charge + warning SFX)
+ */
+export function triggerTestLabBossAttack() {
+  const g = (window.w && window.w.G) ? window.w.G : null;
+  if (!g || !g.activeBoss) return;
+  g.activeBoss._chargingSoundPlayed = false;
+  g.activeBoss.chargeTimer = 1200;
+}
+
+/**
+ * Launch Test Lab
  */
 export function launchTestLab() {
   isTestLabActive = true;
@@ -105,57 +189,9 @@ export function launchTestLab() {
     pauseBtn.classList.add('active');
   }
 
-  // Initialize Authentic Boss Mode at Wave 27 (Boss 9)
+  // Initialize selected boss in Test Lab
   setTimeout(() => {
-    const g = (window.w && window.w.G) ? window.w.G : null;
-    if (g) {
-      g.bossMode = true;
-      g.wave = 27; // Authentic Wave 27 (Boss 9 in Boss Mode)
-      g.waveTransition = false;
-      g._pendingWave = false;
-      g._upgradeQueue = 0;
-
-      // Clean out any leftover entities without breaking pooled arrays and push methods
-      if (g.bullets) g.bullets.length = 0;
-      if (g.playerBullets) g.playerBullets.length = 0;
-      if (g.enemyBullets) g.enemyBullets.length = 0;
-      if (g.enemies) g.enemies.length = 0;
-      if (g.parts) g.parts.length = 0;
-      if (g.pickups) g.pickups.length = 0;
-      g.activeBoss = null;
-
-      // Cancel any wave banner so it doesn't later wipe the boss wave
-      if (window.w) {
-        window.w._waveBanner = null;
-      }
-
-      // Apply Max Weapons & God Mode to Player
-      applyMaxPlayerWeapons(g);
-
-      // Spawn authentic Boss 9 using official game engine Bv(27, al)
-      if (typeof window.Bv === 'function') {
-        window.Bv(27, al);
-      }
-
-      // Mark boss invulnerable so it never dies during testing
-      if (g.activeBoss) {
-        g.activeBoss.invulnerable = true;
-      }
-
-      // Ensure top-right wave label displays BOSS 9
-      const waveLbl = document.getElementById('wave-lbl');
-      if (waveLbl) waveLbl.innerHTML = '<span class="wave-title">BOSS</span><span class="wave-val">9</span>';
-
-      // Ensure Boss Bar displays BOSS 9
-      const bbWrap = document.getElementById('boss-bar-wrap');
-      const bbName = document.getElementById('boss-name-lbl');
-      const bbFill = document.getElementById('boss-bar-fill');
-      const bbVal = document.getElementById('boss-bar-val');
-      if (bbWrap) bbWrap.classList.add('show');
-      if (bbName) bbName.textContent = 'BOSS 9 (INVULNERABLE)';
-      if (bbFill) bbFill.style.width = '100%';
-      if (bbVal) bbVal.textContent = 'INVULNERABLE';
-    }
+    switchTestLabBoss(testLabSelectedBoss);
     createOrShowDock();
   }, 120);
 }
@@ -164,6 +200,7 @@ export function launchTestLab() {
  * Exit Test Lab and return to Start Screen
  */
 export function exitTestLab() {
+  try { stopBossWarnSfx(); } catch(e) {}
   isTestLabActive = false;
   window.isTestLabActive = false;
 
@@ -230,33 +267,100 @@ function setupDockEvents(dock) {
     const target = e.target;
     if (!target) return;
 
+    // Minimize / Expand
     if (target.id === 'tl-btn-minimize' || target.closest('#tl-btn-minimize')) {
       dockMinimized = !dockMinimized;
       updateDockUI();
-    } else if (target.id === 'tl-btn-pause' || target.closest('#tl-btn-pause')) {
+      return;
+    }
+
+    // Pause
+    if (target.id === 'tl-btn-pause' || target.closest('#tl-btn-pause')) {
       const pauseBtn = document.getElementById('pause-btn');
       if (pauseBtn) pauseBtn.click();
-    } else if (target.id === 'tl-fps-60' || target.closest('#tl-fps-60')) {
+      return;
+    }
+
+    // Exit
+    if (target.id === 'tl-btn-exit' || target.closest('#tl-btn-exit')) {
+      exitTestLab();
+      return;
+    }
+
+    // Boss Switcher Buttons
+    const bossBtn = target.closest('.tl-boss-btn');
+    if (bossBtn) {
+      const idx = parseInt(bossBtn.getAttribute('data-boss-idx'), 10);
+      if (!isNaN(idx)) switchTestLabBoss(idx);
+      return;
+    }
+
+    // Trigger Boss Attack
+    if (target.id === 'tl-btn-trigger-attack' || target.closest('#tl-btn-trigger-attack')) {
+      triggerTestLabBossAttack();
+      return;
+    }
+
+    // Play Cue Preview
+    const playCueBtn = target.closest('.tl-btn-play-cue');
+    if (playCueBtn) {
+      const bType = parseInt(playCueBtn.getAttribute('data-boss-type'), 10);
+      const vIdx = parseInt(playCueBtn.getAttribute('data-variant-idx'), 10);
+      if (!isNaN(bType) && !isNaN(vIdx)) {
+        playBossWarnSfx(bType, vIdx, true);
+      }
+      return;
+    }
+
+    // Select Cue Variant
+    const selectCueBtn = target.closest('.tl-btn-select-cue');
+    if (selectCueBtn) {
+      const bType = parseInt(selectCueBtn.getAttribute('data-boss-type'), 10);
+      const vIdx = parseInt(selectCueBtn.getAttribute('data-variant-idx'), 10);
+      if (!isNaN(bType) && !isNaN(vIdx)) {
+        setBossCueVariant(bType, vIdx);
+        updateDockUI();
+      }
+      return;
+    }
+
+    // Refresh rate targets
+    if (target.id === 'tl-fps-60' || target.closest('#tl-fps-60')) {
       if (window.selectFpsTarget) window.selectFpsTarget('60hz');
       updateDockUI();
-    } else if (target.id === 'tl-fps-120' || target.closest('#tl-fps-120')) {
+      return;
+    }
+    if (target.id === 'tl-fps-120' || target.closest('#tl-fps-120')) {
       if (window.selectFpsTarget) window.selectFpsTarget('120hz');
       updateDockUI();
-    } else if (target.id === 'tl-fps-auto' || target.closest('#tl-fps-auto')) {
+      return;
+    }
+    if (target.id === 'tl-fps-auto' || target.closest('#tl-fps-auto')) {
       if (window.selectFpsTarget) window.selectFpsTarget('auto');
       updateDockUI();
-    } else if (target.id === 'tl-mode-1' || target.closest('#tl-mode-1')) {
+      return;
+    }
+
+    // Timing mode buttons
+    if (target.id === 'tl-mode-1' || target.closest('#tl-mode-1')) {
       setTimingMode('mode1_clamped60');
-    } else if (target.id === 'tl-mode-2' || target.closest('#tl-mode-2')) {
+      return;
+    }
+    if (target.id === 'tl-mode-2' || target.closest('#tl-mode-2')) {
       setTimingMode('mode2_smooth_dt');
-    } else if (target.id === 'tl-mode-3' || target.closest('#tl-mode-3')) {
+      return;
+    }
+    if (target.id === 'tl-mode-3' || target.closest('#tl-mode-3')) {
       setTimingMode('mode3_fixed_accumulator');
-    } else if (target.id === 'tl-mode-4' || target.closest('#tl-mode-4')) {
+      return;
+    }
+    if (target.id === 'tl-mode-4' || target.closest('#tl-mode-4')) {
       setTimingMode('mode4_uncapped_native');
-    } else if (target.id === 'tl-mode-5' || target.closest('#tl-mode-5')) {
+      return;
+    }
+    if (target.id === 'tl-mode-5' || target.closest('#tl-mode-5')) {
       setTimingMode('mode5_30hz_interpolated');
-    } else if (target.id === 'tl-btn-exit' || target.closest('#tl-btn-exit')) {
-      exitTestLab();
+      return;
     }
   });
 }
@@ -273,7 +377,7 @@ export function updateTestLabTelemetry(fps, delta, subSteps, computeMs) {
   const g = (window.w && window.w.G) ? window.w.G : null;
   if (!g) return;
 
-  // Maintain Invulnerability for both Player and Boss 9
+  // Maintain Invulnerability for both Player and Boss
   g.hp = g.maxHp = 9999;
   g.godMode = true;
   g.invulnerable = true;
@@ -311,11 +415,20 @@ export function updateDockUI() {
 
   const curFpsMode = (window.et && window.et.targetFps) ? window.et.targetFps : 'auto';
   const modeObj = TIMING_MODES.find(m => m.id === timingMode) || TIMING_MODES[0];
+  const bossDef = al[testLabSelectedBoss] || al[0];
+  const bossType = bossDef.bossType;
+  const activeVariant = getBossCueVariant(bossType);
+  const variants = (bossAudioVariantNames && bossAudioVariantNames[bossType]) ? bossAudioVariantNames[bossType] : [
+    { name: 'Variant 1', desc: 'Default audio warning cue' },
+    { name: 'Variant 2', desc: 'Alternative procedural audio cue' },
+    { name: 'Variant 3', desc: 'Experimental procedural audio cue' }
+  ];
 
   if (dockMinimized) {
     dock.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
         <span style="color:#00ffaa; font-weight:bold; font-size:12px;">🧪 TEST LAB: <span id="tl-stat-fps">60 FPS</span></span>
+        <span style="color:${bossDef.clr}; font-weight:bold; font-size:11px;">BOSS ${testLabSelectedBoss + 1}</span>
         <span style="color:#ffcc00; font-size:11px;" id="tl-stat-delta">16.6ms</span>
         <div style="display:flex; gap:6px;">
           <button id="tl-btn-pause" class="tl-btn" style="padding:2px 8px; font-size:10px; background:#ffaa00; color:#000; font-weight:bold;">⏸ PAUSE</button>
@@ -326,18 +439,72 @@ export function updateDockUI() {
     return;
   }
 
+  // Generate 10 Boss Switcher Buttons
+  let bossButtonsHtml = '';
+  for (let b = 0; b < 10; b++) {
+    const isSelected = b === testLabSelectedBoss;
+    const bInfo = al[b] || { clr: '#00ffaa' };
+    bossButtonsHtml += `
+      <button class="tl-btn tl-boss-btn" data-boss-idx="${b}" style="flex:1; min-width:32px; padding:4px 2px; font-size:10px; font-weight:bold; text-align:center; background:${isSelected ? bInfo.clr : 'rgba(15,25,35,0.9)'}; color:${isSelected ? '#000000' : '#ffffff'}; border:1px solid ${isSelected ? '#ffffff' : 'rgba(255,255,255,0.2)'}; box-shadow:${isSelected ? '0 0 8px ' + bInfo.clr : 'none'};">
+        B${b + 1}
+      </button>
+    `;
+  }
+
+  // Generate 3 Sound Variation Cards
+  let soundVariantsHtml = '';
+  for (let v = 0; v < 3; v++) {
+    const isActive = v === activeVariant;
+    const vData = variants[v] || { name: `Variant ${v + 1}`, desc: '' };
+    soundVariantsHtml += `
+      <div style="background:${isActive ? 'rgba(0,255,170,0.08)' : 'rgba(0,15,30,0.7)'}; border:1px solid ${isActive ? '#00ffaa' : 'rgba(255,255,255,0.12)'}; border-radius:6px; padding:6px 8px; margin-bottom:5px; transition:border-color 0.2s;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:9px; background:${isActive ? '#00ffaa' : 'rgba(255,255,255,0.15)'}; color:${isActive ? '#000' : '#fff'}; font-weight:bold; padding:1px 4px; border-radius:3px;">V${v + 1}</span>
+            <span style="font-size:11px; font-weight:bold; color:${isActive ? '#00ffaa' : '#ffffff'};">${vData.name}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button class="tl-btn tl-btn-play-cue" data-boss-type="${bossType}" data-variant-idx="${v}" style="padding:2px 8px; font-size:10px; background:#00e5ff; color:#000; font-weight:bold; border-color:#00e5ff;">▶ PLAY</button>
+            <button class="tl-btn tl-btn-select-cue" data-boss-type="${bossType}" data-variant-idx="${v}" style="padding:2px 8px; font-size:10px; background:${isActive ? '#00ffaa' : 'rgba(255,255,255,0.1)'}; color:${isActive ? '#000' : '#88e5ff'}; font-weight:bold; border-color:${isActive ? '#00ffaa' : 'rgba(255,255,255,0.2)'};">${isActive ? '✓ ACTIVE' : 'SELECT'}</button>
+          </div>
+        </div>
+        <div style="font-size:9px; color:#99bbcc; font-family:'Outfit',sans-serif; line-height:1.25;">${vData.desc}</div>
+      </div>
+    `;
+  }
+
   dock.innerHTML = `
     <!-- Dock Header -->
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,255,170,0.3); padding-bottom:5px; margin-bottom:8px;">
       <div style="display:flex; align-items:center; gap:6px;">
-        <span style="font-size:13px; font-weight:bold; color:#00ffaa; text-shadow:0 0 8px #00ffaa;">🧪 HZ & TIMING LAB</span>
-        <span style="font-size:9px; background:rgba(0,255,170,0.15); color:#00ffaa; border:1px solid #00ffaa; padding:1px 4px; border-radius:3px;">BOSS 9 DUEL</span>
+        <span style="font-size:13px; font-weight:bold; color:#00ffaa; text-shadow:0 0 8px #00ffaa;">🧪 TEST LAB</span>
+        <span style="font-size:9px; background:rgba(0,255,170,0.15); color:${bossDef.clr}; border:1px solid ${bossDef.clr}; padding:1px 5px; border-radius:3px; font-weight:bold;">BOSS ${testLabSelectedBoss + 1}</span>
       </div>
       <div style="display:flex; gap:5px;">
         <button id="tl-btn-pause" class="tl-btn" style="padding:2px 8px; font-size:10px; background:#ffaa00; color:#000; font-weight:bold;">⏸ PAUSE</button>
         <button id="tl-btn-minimize" class="tl-btn" style="padding:2px 8px; font-size:10px; background:#00e5ff; color:#000;">MIN</button>
         <button id="tl-btn-exit" class="tl-btn" style="padding:2px 8px; font-size:10px; background:#ff3366; color:#fff; font-weight:bold;">✕ EXIT</button>
       </div>
+    </div>
+
+    <!-- 10 Boss Switcher Bar -->
+    <div style="margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span style="font-size:10px; color:#88e5ff; font-weight:bold; letter-spacing:0.5px;">CHOOSE BOSS (1–10):</span>
+        <span style="font-size:10px; color:${bossDef.clr}; font-weight:bold;">${bossDef.name}</span>
+      </div>
+      <div style="display:flex; gap:3px; overflow-x:auto; padding-bottom:2px;">
+        ${bossButtonsHtml}
+      </div>
+    </div>
+
+    <!-- Boss Attack Warning Cues Section (3 Variations) -->
+    <div style="margin-bottom:8px; background:rgba(4,20,35,0.7); border:1px solid rgba(0,229,255,0.25); border-radius:6px; padding:7px 8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-size:10.5px; color:#ffcc00; font-weight:bold; letter-spacing:0.5px;">⚡ ATTACK WARNING SFX (3 VARIATIONS):</span>
+        <button id="tl-btn-trigger-attack" class="tl-btn" style="padding:3px 10px; font-size:10px; background:linear-gradient(90deg, #ff3366, #ff8800); color:#ffffff; font-weight:bold; border:none; box-shadow:0 0 10px rgba(255,80,0,0.5);">⚡ TRIGGER ATTACK</button>
+      </div>
+      ${soundVariantsHtml}
     </div>
 
     <!-- Target Refresh Switcher (60Hz / 120Hz / Auto) -->
@@ -388,3 +555,5 @@ export function updateDockUI() {
 }
 
 window.updateTestLabDockUI = updateDockUI;
+window.switchTestLabBoss = switchTestLabBoss;
+window.triggerTestLabBossAttack = triggerTestLabBossAttack;

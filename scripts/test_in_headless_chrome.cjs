@@ -128,9 +128,40 @@ async function main() {
       var opened = sc && !sc.classList.contains("hidden");
       var devRowVisible = devRow && window.getComputedStyle(devRow).display !== "none";
       var devBtnText = devBtn ? devBtn.textContent : null;
+
+      // Test Advanced Sound Settings modal & Boss Attack Cues toggle
+      var btnSoundAdv = document.getElementById("btn-configure-sound");
+      var advSc = document.getElementById("adv-sounds-screen");
+      var bossCuesBtn = document.getElementById("set-sfx-boss-cues-btn");
+      var advBackBtn = document.getElementById("btn-hide-adv-sounds");
+      if (btnSoundAdv) btnSoundAdv.click();
+      var advOpened = advSc && !advSc.classList.contains("hidden");
+      var bossCuesInitial = bossCuesBtn ? bossCuesBtn.textContent : null;
+      if (bossCuesBtn) bossCuesBtn.click();
+      var bossCuesToggledOff = bossCuesBtn ? bossCuesBtn.textContent : null;
+      var settingOff = window.et ? window.et.sfx_boss_cues : null;
+      if (bossCuesBtn) bossCuesBtn.click();
+      var bossCuesToggledOn = bossCuesBtn ? bossCuesBtn.textContent : null;
+      var settingOn = window.et ? window.et.sfx_boss_cues : null;
+      if (advBackBtn) advBackBtn.click();
+      var advClosed = advSc && advSc.classList.contains("hidden");
+
       if (backBtn) backBtn.click();
       var closed = sc && sc.classList.contains("hidden");
-      return { buttonFound: !!btn, opened: opened, devRowVisible: devRowVisible, devBtnText: devBtnText, closedAfterBack: closed };
+      return {
+        buttonFound: !!btn,
+        opened: opened,
+        devRowVisible: devRowVisible,
+        devBtnText: devBtnText,
+        closedAfterBack: closed,
+        advOpened: advOpened,
+        bossCuesInitial: bossCuesInitial,
+        bossCuesToggledOff: bossCuesToggledOff,
+        settingOff: settingOff,
+        bossCuesToggledOn: bossCuesToggledOn,
+        settingOn: settingOn,
+        advClosed: advClosed
+      };
     })())`
   });
   console.log('4. Settings modal test:', settingsTest.result.result.value);
@@ -172,7 +203,7 @@ async function main() {
 
   await wait(600);
 
-  // Test Pausing, Resuming, Target Refresh switching, and Spawners in Test Lab
+  // Test Pausing, Resuming, Target Refresh switching, 10 Boss Switcher, and 3-Sound Variations in Test Lab
   const testLabInteraction = await send('Runtime.evaluate', {
     expression: `JSON.stringify((function() {
       var pauseBtn = document.getElementById("tl-btn-pause");
@@ -198,6 +229,29 @@ async function main() {
       if (fps60) fps60.click();
       var target60 = (window.et && window.et.targetFps === "60hz");
 
+      // Test 10 Boss Switching (B1 to B10)
+      var bossSwitchSuccess = true;
+      for (var b = 0; b < 10; b++) {
+        if (window.switchTestLabBoss) window.switchTestLabBoss(b);
+        if (!g || g.wave !== (b + 1) * 3 || !g.activeBoss || !g.activeBoss.alive || !g.activeBoss.invulnerable) {
+          bossSwitchSuccess = false;
+        }
+      }
+
+      // Test 3 Sound Variations for selected boss (B4 / Boss 4 Solar Reactor Fortress)
+      window.switchTestLabBoss(3);
+      var bossDef = window.al[3];
+      var bType = bossDef.bossType;
+      
+      // Set variant 1
+      window.setBossCueVariant(bType, 1);
+      var savedVariant = window.getBossCueVariant(bType);
+
+      // Trigger attack and verify chargeTimer set to 1200ms
+      var triggerBtn = document.getElementById("tl-btn-trigger-attack");
+      if (triggerBtn) triggerBtn.click();
+      var timerAfterTrigger = g && g.activeBoss ? g.activeBoss.chargeTimer : null;
+
       // Test Direct Timing Mode Switches
       var m2 = document.getElementById("tl-mode-2");
       if (m2) m2.click();
@@ -217,6 +271,9 @@ async function main() {
         pauseScClosed: pauseScClosed,
         target120Worked: target120,
         target60Worked: target60,
+        bossSwitchSuccess: bossSwitchSuccess,
+        savedVariantMatches: savedVariant === 1,
+        timerAfterTrigger: timerAfterTrigger,
         timingMode2Available: !!m2,
         timingMode3Available: !!m3,
         timingMode5Available: !!m5,
@@ -225,7 +282,7 @@ async function main() {
       };
     })())`
   });
-  console.log('5c. Test Lab pause, refresh rate & spawner test:', testLabInteraction.result.result.value);
+  console.log('5c. Test Lab pause, refresh rate, 10-boss & 3-sound test:', testLabInteraction.result.result.value);
 
   await wait(400);
 
