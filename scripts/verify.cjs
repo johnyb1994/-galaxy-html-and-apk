@@ -98,6 +98,7 @@ const requiredSrcFiles = [
   'src/main.js',
   'src/styles/main.css',
   'src/assets/boss_skull.png',
+  'src/assets/bullet_comet.png',
   'src/assets/siren.mp3',
   'src/game/bosses.js',
   'src/game/audio.js',
