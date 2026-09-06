@@ -715,8 +715,9 @@ function _onMouseMove(L){
   const rect=_getGaRect();
   const gx=(L.clientX-rect.left)/rect.width*w.w;
   const gy=(L.clientY-rect.top)/rect.height*w.h;
-  j.px=Bh(gx,j.pw*.18,w.w-j.pw*.18);
-  j.py=Bh(gy,j.ph/2,w.h-j.ph/2);
+  const isGold=(j.skin==="golden_sovereign"||(j.equippedSkin&&j.equippedSkin.id==="golden_sovereign")),hw=j.pw*.35,hh=j.ph*.51,hyOff=j.ph*(isGold?.20:.09);
+  j.px=Bh(gx,hw,w.w-hw);
+  j.py=Bh(gy,hh-hyOff,w.h-(hh+hyOff));
   j.basePx=j.px;
   j.basePy=j.py;
   j.isDragging=!0;
@@ -805,8 +806,9 @@ function _processPendingTouchPointer(){
   const j=w.G;
   if(!j||!j.running||j.paused||!j.isDragging||_pendingPx===null)return;
   const se=ye(_pendingPx),ge=Ce(_pendingPy);
-  j.px=Bh(rl+(se-Ye),j.pw*.18,w.w-j.pw*.18);
-  j.py=Bh(Ml+(ge-Ee),j.ph/2,w.h-j.ph/2);
+  const isGold=(j.skin==="golden_sovereign"||(j.equippedSkin&&j.equippedSkin.id==="golden_sovereign")),hw=j.pw*.35,hh=j.ph*.51,hyOff=j.ph*(isGold?.20:.09);
+  j.px=Bh(rl+(se-Ye),hw,w.w-hw);
+  j.py=Bh(Ml+(ge-Ee),hh-hyOff,w.h-(hh+hyOff));
 }
 
 function nl(L){
