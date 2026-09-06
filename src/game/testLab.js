@@ -72,7 +72,7 @@ export function applyMaxPlayerWeapons(g) {
   g.rate = 140;        // Extreme firing rate
   g.dmg = 24;          // High damage
   g.laserLevel = 5;    // Max dual plasma lasers
-  g.aura = true;       // Ion aura active
+  g.aura = true;       // Plasma field active
   g.auraNova = true;   // Periodic pulse nova
   g.auraDmgMult = 3.0; // 3x aura damage
   g.pierce = 4;        // Plasma bolts pierce 4 targets

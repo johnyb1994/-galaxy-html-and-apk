@@ -378,6 +378,7 @@ async function main() {
     process.exit(1);
   } else {
     console.log('\n\x1b[32m✔ 100% REAL GOOGLE CHROME VERIFICATION PASSED WITH ZERO EXCEPTIONS!\x1b[0m\n');
+    process.exit(0);
   }
 }
 
