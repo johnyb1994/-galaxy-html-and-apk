@@ -167,7 +167,7 @@
   window.__devMetrics = devMetrics;
 
   let storedState = localStorage.getItem("galaxy_dev_diag");
-  let isDevDiagEnabled = storedState !== "off";
+  let isDevDiagEnabled = storedState === "on";
   let isMinimized = false;
 
   function updateDevDiagState(enabled) {

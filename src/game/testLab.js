@@ -246,6 +246,8 @@ export function exitTestLab() {
     pauseBtn.style.display = 'none';
   }
 }
+window.launchTestLab = launchTestLab;
+window.exitTestLab = exitTestLab;
 
 /**
  * Test Lab On-Screen Dock & Telemetry HUD Overlay

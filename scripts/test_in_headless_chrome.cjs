@@ -146,6 +146,16 @@ async function main() {
       if (advBackBtn) advBackBtn.click();
       var advClosed = advSc && advSc.classList.contains("hidden");
 
+      // Test Hit Damage Alert toggle in Visuals section
+      var hitAlertBtn = document.getElementById("set-hit-alert-btn");
+      var hitAlertInitial = hitAlertBtn ? hitAlertBtn.textContent : null;
+      if (hitAlertBtn) hitAlertBtn.click();
+      var hitAlertToggledOff = hitAlertBtn ? hitAlertBtn.textContent : null;
+      var hitSettingOff = window.et ? window.et.hitDamageAlert : null;
+      if (hitAlertBtn) hitAlertBtn.click();
+      var hitAlertToggledOn = hitAlertBtn ? hitAlertBtn.textContent : null;
+      var hitSettingOn = window.et ? window.et.hitDamageAlert : null;
+
       if (backBtn) backBtn.click();
       var closed = sc && sc.classList.contains("hidden");
       return {
@@ -160,7 +170,12 @@ async function main() {
         settingOff: settingOff,
         bossCuesToggledOn: bossCuesToggledOn,
         settingOn: settingOn,
-        advClosed: advClosed
+        advClosed: advClosed,
+        hitAlertInitial: hitAlertInitial,
+        hitAlertToggledOff: hitAlertToggledOff,
+        hitSettingOff: hitSettingOff,
+        hitAlertToggledOn: hitAlertToggledOn,
+        hitSettingOn: hitSettingOn
       };
     })())`
   });
@@ -185,8 +200,11 @@ async function main() {
   const testLabCheck = await send('Runtime.evaluate', {
     expression: `JSON.stringify((function() {
       var labBtn = document.getElementById("btn-show-test-lab");
-      if (!labBtn) return { buttonFound: false };
-      labBtn.click();
+      if (labBtn) {
+        labBtn.click();
+      } else if (window.launchTestLab) {
+        window.launchTestLab();
+      }
       var g = window.w ? window.w.G : null;
       var dock = document.getElementById("test-lab-dock");
       return {
@@ -309,6 +327,30 @@ async function main() {
     })())`
   });
   console.log('   Launch result:', launchTest?.result?.result?.value || JSON.stringify(launchTest));
+
+  // 6b. Test Player Hit Damage & Invulnerability Alert
+  const hitTest = await send('Runtime.evaluate', {
+    expression: `JSON.stringify((function() {
+      var g = window.w && window.w.G;
+      if (!g) return { ok: false, error: "no_game_state" };
+      var hpBefore = g.hp;
+      g.iTimer = g.iframes;
+      if (typeof window.Ah === 'function') {
+        window.Ah(15);
+      }
+      return {
+        ok: true,
+        hpBefore: hpBefore,
+        hpAfter: g.hp,
+        tookDamage: g.hp < hpBefore,
+        iTimer: g.iTimer,
+        hitAlertTimer: g.hitAlertTimer,
+        timersMatched: g.hitAlertTimer === g.iTimer && g.hitAlertTimer > 0,
+        hitSettingOn: !!window.et.hitDamageAlert
+      };
+    })())`
+  });
+  console.log('   Hit alert gameplay result:', hitTest?.result?.result?.value);
 
   await wait(2000);
 
