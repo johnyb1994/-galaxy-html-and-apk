@@ -1,0 +1,61 @@
+# Deploy Galaxy Outlast web build to GitHub Pages.
+# Gives you a shareable link like:
+#   https://<username>.github.io/<repo>/
+#
+# Setup (one time, on github.com):
+#   1. Push this repo to GitHub
+#   2. Go to Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+#   3. Push to main (or run the workflow manually) and share the URL from the deploy step
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # NOTE: runs `vite build` directly (not `npm run build`) to skip
+      # the OneDrive sync step, which only makes sense on your local PC.
+      - name: Build game
+        run: npx vite build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
