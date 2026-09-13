@@ -809,11 +809,22 @@ canvas#c.hdr-mode {
   color: #ffffff !important;
   box-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
 }
-.gfx-preset-btn.active, .fps-target-btn.active {
+.gfx-preset-btn.active, .fps-target-btn.active, .timing-mode-btn.active {
   background: linear-gradient(135deg, #003322, #006644) !important;
   border-color: #00ffaa !important;
   color: #aaffdd !important;
   box-shadow: 0 0 8px rgba(0, 255, 170, 0.4);
+}
+.timing-mode-btn {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(4, 20, 35, 0.7);
+  color: #cceeff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.timing-mode-btn:active {
+  transform: scale(0.96);
 }
 .settings-tab-panel {
   width: 100%;

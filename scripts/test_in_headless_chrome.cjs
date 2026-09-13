@@ -156,6 +156,16 @@ async function main() {
       var hitAlertToggledOn = hitAlertBtn ? hitAlertBtn.textContent : null;
       var hitSettingOn = window.et ? window.et.hitDamageAlert : null;
 
+      // Test Timing Mode selection buttons
+      var btnMode1 = document.getElementById("set-timing-mode1");
+      var btnMode2 = document.getElementById("set-timing-mode2");
+      var btnMode3 = document.getElementById("set-timing-mode3");
+      var btnMode5 = document.getElementById("set-timing-mode5");
+      if (btnMode2) btnMode2.click();
+      var timingModeAfter2 = window.et ? window.et.timingMode : null;
+      if (btnMode1) btnMode1.click();
+      var timingModeAfter1 = window.et ? window.et.timingMode : null;
+
       if (backBtn) backBtn.click();
       var closed = sc && sc.classList.contains("hidden");
       return {
@@ -175,11 +185,23 @@ async function main() {
         hitAlertToggledOff: hitAlertToggledOff,
         hitSettingOff: hitSettingOff,
         hitAlertToggledOn: hitAlertToggledOn,
-        hitSettingOn: hitSettingOn
+        hitSettingOn: hitSettingOn,
+        timingButtonsFound: !!(btnMode1 && btnMode2 && btnMode3 && btnMode5),
+        timingModeAfter2: timingModeAfter2,
+        timingModeAfter1: timingModeAfter1
       };
     })())`
   });
   console.log('4. Settings modal test:', settingsTest.result.result.value);
+
+  // Capture settings screenshot
+  await send('Runtime.evaluate', { expression: 'document.getElementById("btn-show-settings").click()' });
+  await wait(300);
+  const settingsShot = await send('Page.captureScreenshot', { format: 'png' });
+  require('fs').writeFileSync(path.resolve('settings_screenshot.png'), Buffer.from(settingsShot.result.data, 'base64'));
+  console.log('📸 Settings screenshot saved to: galaxy_apk/settings_screenshot.png');
+  await send('Runtime.evaluate', { expression: 'document.getElementById("btn-hide-settings").click()' });
+  await wait(300);
 
   // 5. Test Equipment modal
   const eqTest = await send('Runtime.evaluate', {

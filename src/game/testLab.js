@@ -35,6 +35,11 @@ export const TIMING_MODES = [
     id: 'mode4_uncapped_native',
     name: 'Mode 4: Native Uncapped RAF (Hardware VSync)',
     desc: '1:1 lock with hardware screen refreshes. Timestep is normalized to target refresh rate so movement speed stays 1.0x normal time.'
+  },
+  {
+    id: 'mode5_30hz_interpolated',
+    name: 'Mode 5: 30Hz Decoupled (2:1 Interpolated)',
+    desc: '30Hz physics tick rate with 2:1 rendering interpolation. Ultra-low battery & thermal load.'
   }
 ];
 
@@ -43,12 +48,22 @@ export function isTestLab() {
 }
 
 export function getTimingMode() {
-  return timingMode;
+  if (window.et && window.et.timingMode) {
+    timingMode = window.et.timingMode;
+  }
+  return timingMode || 'mode1_clamped60';
 }
 
 export function setTimingMode(mode) {
-  timingMode = mode;
-  updateDockUI();
+  if (TIMING_MODES.some(m => m.id === mode)) {
+    timingMode = mode;
+    if (window.et) {
+      window.et.timingMode = mode;
+      if (typeof window.K0 === 'function') window.K0();
+    }
+    if (window.updateSettingsTimingUI) window.updateSettingsTimingUI();
+    updateDockUI();
+  }
 }
 
 export function getSelectedTestLabBoss() {
