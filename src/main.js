@@ -58,12 +58,14 @@ if ('serviceWorker' in navigator) {
         }
       }
 
-// 3. Game Core Modules & Full Cross-Module Imports
 import {
   sirenAudioSrc, sfxBuffers, playBufferSfx, pauseSiren,
   fo, U0, Ph, Uh, Nh, Gn, Rn, J0, W0, $0, F0, x0, eu, tu, Yh, lu, Fe,
-  stopBossWarnSfx
+  playBossWarnSfx, stopBossWarnSfx,
+  bossAudioVariants, bossAudioVariantNames,
+  getBossCueVariant, setBossCueVariant
 } from './game/audio.js';
+import { al } from './game/bosses.js';
 import {
   GAME_CONSTANTS, w, et, WPN_ICONS, ha, pl, Z0, kh, so, ao, _pb, Ln, H0, Qh, Jv,
   N0, qh, ma, Bv, Av, wv, zv, Gv, Ra, Ah, Rv, Hv, Pv, Uv, Nv, Gh, Mv, Rh,
@@ -584,6 +586,16 @@ Error generating stack: `+n.message+`
             <span class="settings-label" style="font-weight: bold; font-size: 15px;">⚠️ Boss Attack Cues</span>
             <button class="toggle-btn" id="set-sfx-boss-cues-btn">ON</button>
           </div>
+          <div id="adv-boss-cues-section" style="margin-top: 10px; background: rgba(0,20,35,0.7); border: 1px solid rgba(0,229,255,0.25); border-radius: 8px; padding: 10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+              <span style="color:#00e5ff; font-weight:bold; font-size:11.5px; letter-spacing:0.5px;">CUSTOMIZE BOSS SOUND CUES</span>
+              <span id="adv-boss-cue-selected-lbl" style="color:#ffcc00; font-size:11px; font-weight:bold;">BOSS 1</span>
+            </div>
+            <!-- Boss Switcher Tabs B1..B10 -->
+            <div id="adv-boss-cue-tabs" style="display:flex; gap:3px; overflow-x:auto; padding-bottom:6px; margin-bottom:8px; -webkit-overflow-scrolling:touch;"></div>
+            <!-- 3 Sound Variations Container -->
+            <div id="adv-boss-cue-variants"></div>
+          </div>
         </div>
       </div>
       
@@ -907,7 +919,100 @@ window.addEventListener("blur",()=>{if(document.hidden)_handleAppMinimize();});
                 ${g}
             </div>
         </div>
-    `}function tg(a,f,cap=3){const is5=cap>3;const p=is5?`style="margin-top: 2px; padding: 1.5px 5px; background: rgba(255,204,0,0.06); border-left: 2px solid #ffcc00; font-size: clamp(9.5px, 2.1vw, 11.5px); color: #ffcc00; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; border-radius: 0 4px 4px 0; line-height: 1.2;"`:`style="margin-top: 4px; padding: 3px 6px; background: rgba(255,204,0,0.06); border-left: 2px solid #ffcc00; font-size: clamp(11px, 2.5vw, 13px); color: #ffcc00; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; border-radius: 0 4px 4px 0; line-height: 1.35;"`;if(a==="multi"){const r=Math.round(18*f*(1e3/600));if(f===5){const d=Math.round(8*18*1.6666666666666667),h=r+d;return`<div ${p}>18 damage per bolt / ${h} total DPS<br>18 damage per ring bolt / ${d} ring DPS</div>`}return`<div ${p}>18 damage per bolt / ${r} DPS</div>`}if(a==="dmg")return"";if(a==="fire"){let u=600;for(let d=1;d<=f;d++)u=Math.round(u*(d===5?.714:.85));const r=1e3/u;return`<div ${p}>firing speed ${r.toFixed(2)} shots/s</div>`}if(a==="aura"){const u=1+(f-1)*.5,r=Math.round(30*u);if(f===5){const d=Math.round(36);return`<div ${p}>${u.toFixed(1)}x damage multiplier / ${r} DPS<br>6.0x pulse damage / ${d} pulse DPS</div>`}return`<div ${p}>${u.toFixed(1)}x damage multiplier / ${r} DPS</div>`}if(a==="laser"){const u=f===5?6:f*1,r=Math.round(18*u);return`<div ${p}>${u.toFixed(1)}x damage multiplier / ${r} DPS</div>`}if(a==="hp")return"";if(a==="pierce"){const u=f+1;return f===3?`<div ${p}>each plasma bolt can hit ${u} enemies + 25% bullet speed</div>`:`<div ${p}>each plasma bolt can hit ${u} enemies</div>`}return""}function lg(){const a=eo.useRef(null),[f,p]=eo.useState(!1);return eo.useEffect(()=>(window.__bootStage="effect-run",a.current&&!f&&(p(!0),function(){try{(!localStorage.getItem("galaxy_outlast_settings")&&localStorage.getItem("vi_settings")&&localStorage.setItem("galaxy_outlast_settings",localStorage.getItem("vi_settings")),["vamp_invaders_scores","vamp_invaders_skin","vamp_invaders_achievements","vamp_invaders_lore_seen","galaxy_outlast_scores","galaxy_outlast_skin","galaxy_outlast_achievements","galaxy_outlast_lore_seen"].forEach(r=>{const d=localStorage.getItem(r);if(d!==null){const h=r.replace("vamp_invaders_","galaxy_outlast_");if(!localStorage.getItem(h)){let g=d;if(r==="vamp_invaders_achievements"||r==="galaxy_outlast_achievements")try{const v=JSON.parse(d);(v.first_blood||v.first_strike)&&(v.first_strike=!0,delete v.first_blood),(v.blood_drinker||v.energy_harvester)&&(v.energy_harvester=!0,delete v.blood_drinker),g=JSON.stringify(v)}catch{}r.endsWith("skin")&&(d==="first_blood"&&(g="first_strike"),d==="blood_drinker"&&(g="energy_harvester")),localStorage.setItem(h,g)}}}))}catch(e){console.warn("Settings migration skipped",e)}}(),w.bootTimer=setTimeout(()=>{try{window.__bootStage="boot-cb-start";xv(pl,al,ha),window.__bootStage="xv-called",Xl();const r=document.getElementById("btn-show-settings"),d=document.getElementById("settings-screen");r&&d&&(r.onclick=()=>{updateInsanitySettingUI();d.classList.remove("hidden");const devBtn=document.getElementById("set-dev-diag-btn");if(devBtn){const on=localStorage.getItem("galaxy_dev_diag")!=="off";devBtn.textContent=on?"ON":"OFF";devBtn.classList.toggle("on",on)}});const h=document.getElementById("btn-hide-settings"),hTop=document.getElementById("btn-hide-settings-top");h&&d&&(h.onclick=()=>d.classList.add("hidden"));hTop&&d&&(hTop.onclick=()=>d.classList.add("hidden"));const g=document.getElementById("btn-pause-settings");g&&d&&(g.onclick=()=>{updateInsanitySettingUI();d.classList.remove("hidden");const devBtn=document.getElementById("set-dev-diag-btn");if(devBtn){const on=localStorage.getItem("galaxy_dev_diag")!=="off";devBtn.textContent=on?"ON":"OFF";devBtn.classList.toggle("on",on);}});const v=document.getElementById("btn-show-scores"),c=document.getElementById("score-screen");v&&c&&(v.onclick=()=>{setScoreTab(et&&et.bossMode?"boss":"normal");c.classList.remove("hidden")});const y=document.getElementById("btn-hide-scores");y&&c&&(y.onclick=()=>c.classList.add("hidden"));const t1=document.getElementById("tab-scores-normal"),t2=document.getElementById("tab-scores-insanity"),t3=document.getElementById("tab-scores-damageless"),tb=document.getElementById("tab-scores-boss");t1&&(t1.onclick=()=>setScoreTab("normal"));t2&&(t2.onclick=()=>setScoreTab("insanity"));t3&&(t3.onclick=()=>setScoreTab("damageless"));tb&&(tb.onclick=()=>setScoreTab("boss"));const S=document.getElementById("btn-show-lore"),T=document.getElementById("lore-screen");S&&T&&(S.onclick=()=>T.classList.remove("hidden"));const M=document.getElementById("btn-lore-back");M&&T&&(M.onclick=()=>T.classList.add("hidden")),(function(){try{localStorage.getItem("galaxy_outlast_lore_seen")||localStorage.setItem("galaxy_outlast_lore_seen","1")}catch(e){}})(),eg();const E=document.getElementById("slide-sfx-volume"),H=document.getElementById("val-sfx-volume");if(E&&H){const q=et.sfxVolume!==void 0?et.sfxVolume:.5;E.value=Math.round(q*100).toString(),H.textContent=Math.round(q*100)+"%";const $=ee=>{H.textContent=ee+"%",Ph(ee/100)};E.oninput=()=>{$(parseInt(E.value)||0)},E.onchange=()=>{$(parseInt(E.value)||0)}}const Q=document.getElementById("btn-configure-sound"),G=document.getElementById("adv-sounds-screen"),k=document.getElementById("btn-hide-adv-sounds");Q&&G&&(Q.onclick=()=>{G.classList.remove("hidden")}),k&&G&&(k.onclick=()=>{lu(),G.classList.add("hidden")});const b=(q,$)=>{const ee=document.getElementById(q);ee&&(ee.textContent=et[$]?"ON":"OFF",ee.classList.toggle("on",!!et[$]),ee.onclick=()=>{const re=ee.textContent==="ON";ee.textContent=re?"OFF":"ON",ee.classList.toggle("on",!re),et[$]=!re,K0()})};b("set-sfx-shoot-btn","sfx_shoot"),b("set-sfx-hit-btn","sfx_hit"),b("set-sfx-death-btn","sfx_enemy_death"),b("set-sfx-xp-btn","sfx_xp"),b("set-sfx-lvl-btn","sfx_lvlup"),b("set-sfx-phit-btn","sfx_player_hit"),b("set-sfx-siren-btn","sfx_siren"),b("set-sfx-boss-cues-btn","sfx_boss_cues"),b("set-hp-glow-btn","lowHpGlow"),b("set-hit-alert-btn","hitDamageAlert");const btnBoss=document.getElementById("set-boss-btn");btnBoss&&(btnBoss.onclick=()=>{const inRunB=!!(w.G&&w.G.running&&!w.G.over);if(inRunB){updateBossSettingUI();return;}if(!isBossModeUnlocked()){updateBossSettingUI();return;}const reB=btnBoss.textContent==="ON";btnBoss.textContent=reB?"OFF":"ON",btnBoss.classList.toggle("on",!reB),et.bossMode=!reB;if(et.bossMode)et.insanity=!1;K0(),xs(),updateDamageless(),updateBossSettingUI();});updateBossSettingUI();
+    `}function tg(a,f,cap=3){const is5=cap>3;const p=is5?`style="margin-top: 2px; padding: 1.5px 5px; background: rgba(255,204,0,0.06); border-left: 2px solid #ffcc00; font-size: clamp(9.5px, 2.1vw, 11.5px); color: #ffcc00; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; border-radius: 0 4px 4px 0; line-height: 1.2;"`:`style="margin-top: 4px; padding: 3px 6px; background: rgba(255,204,0,0.06); border-left: 2px solid #ffcc00; font-size: clamp(11px, 2.5vw, 13px); color: #ffcc00; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; border-radius: 0 4px 4px 0; line-height: 1.35;"`;if(a==="multi"){const r=Math.round(18*f*(1e3/600));if(f===5){const d=Math.round(8*18*1.6666666666666667),h=r+d;return`<div ${p}>18 damage per bolt / ${h} total DPS<br>18 damage per ring bolt / ${d} ring DPS</div>`}return`<div ${p}>18 damage per bolt / ${r} DPS</div>`}if(a==="dmg")return"";if(a==="fire"){let u=600;for(let d=1;d<=f;d++)u=Math.round(u*(d===5?.714:.85));const r=1e3/u;return`<div ${p}>firing speed ${r.toFixed(2)} shots/s</div>`}if(a==="aura"){const u=1+(f-1)*.5,r=Math.round(30*u);if(f===5){const d=Math.round(36);return`<div ${p}>${u.toFixed(1)}x damage multiplier / ${r} DPS<br>6.0x pulse damage / ${d} pulse DPS</div>`}return`<div ${p}>${u.toFixed(1)}x damage multiplier / ${r} DPS</div>`}if(a==="laser"){const u=f===5?6:f*1,r=Math.round(18*u);return`<div ${p}>${u.toFixed(1)}x damage multiplier / ${r} DPS</div>`}if(a==="hp")return"";if(a==="pierce"){const u=f+1;return f===3?`<div ${p}>each plasma bolt can hit ${u} enemies + 25% bullet speed</div>`:`<div ${p}>each plasma bolt can hit ${u} enemies</div>`}return""}function lg(){const a=eo.useRef(null),[f,p]=eo.useState(!1);return eo.useEffect(()=>(window.__bootStage="effect-run",a.current&&!f&&(p(!0),function(){try{(!localStorage.getItem("galaxy_outlast_settings")&&localStorage.getItem("vi_settings")&&localStorage.setItem("galaxy_outlast_settings",localStorage.getItem("vi_settings")),["vamp_invaders_scores","vamp_invaders_skin","vamp_invaders_achievements","vamp_invaders_lore_seen","galaxy_outlast_scores","galaxy_outlast_skin","galaxy_outlast_achievements","galaxy_outlast_lore_seen"].forEach(r=>{const d=localStorage.getItem(r);if(d!==null){const h=r.replace("vamp_invaders_","galaxy_outlast_");if(!localStorage.getItem(h)){let g=d;if(r==="vamp_invaders_achievements"||r==="galaxy_outlast_achievements")try{const v=JSON.parse(d);(v.first_blood||v.first_strike)&&(v.first_strike=!0,delete v.first_blood),(v.blood_drinker||v.energy_harvester)&&(v.energy_harvester=!0,delete v.blood_drinker),g=JSON.stringify(v)}catch{}r.endsWith("skin")&&(d==="first_blood"&&(g="first_strike"),d==="blood_drinker"&&(g="energy_harvester")),localStorage.setItem(h,g)}}}))}catch(e){console.warn("Settings migration skipped",e)}}(),w.bootTimer=setTimeout(()=>{try{window.__bootStage="boot-cb-start";xv(pl,al,ha),window.__bootStage="xv-called",Xl();const r=document.getElementById("btn-show-settings"),d=document.getElementById("settings-screen");r&&d&&(r.onclick=()=>{updateInsanitySettingUI();d.classList.remove("hidden");const devBtn=document.getElementById("set-dev-diag-btn");if(devBtn){const on=localStorage.getItem("galaxy_dev_diag")!=="off";devBtn.textContent=on?"ON":"OFF";devBtn.classList.toggle("on",on)}});const h=document.getElementById("btn-hide-settings"),hTop=document.getElementById("btn-hide-settings-top");h&&d&&(h.onclick=()=>d.classList.add("hidden"));hTop&&d&&(hTop.onclick=()=>d.classList.add("hidden"));const g=document.getElementById("btn-pause-settings");g&&d&&(g.onclick=()=>{updateInsanitySettingUI();d.classList.remove("hidden");const devBtn=document.getElementById("set-dev-diag-btn");if(devBtn){const on=localStorage.getItem("galaxy_dev_diag")!=="off";devBtn.textContent=on?"ON":"OFF";devBtn.classList.toggle("on",on);}});const v=document.getElementById("btn-show-scores"),c=document.getElementById("score-screen");v&&c&&(v.onclick=()=>{setScoreTab(et&&et.bossMode?"boss":"normal");c.classList.remove("hidden")});const y=document.getElementById("btn-hide-scores");y&&c&&(y.onclick=()=>c.classList.add("hidden"));const t1=document.getElementById("tab-scores-normal"),t2=document.getElementById("tab-scores-insanity"),t3=document.getElementById("tab-scores-damageless"),tb=document.getElementById("tab-scores-boss");t1&&(t1.onclick=()=>setScoreTab("normal"));t2&&(t2.onclick=()=>setScoreTab("insanity"));t3&&(t3.onclick=()=>setScoreTab("damageless"));tb&&(tb.onclick=()=>setScoreTab("boss"));const S=document.getElementById("btn-show-lore"),T=document.getElementById("lore-screen");S&&T&&(S.onclick=()=>T.classList.remove("hidden"));const M=document.getElementById("btn-lore-back");M&&T&&(M.onclick=()=>T.classList.add("hidden")),(function(){try{localStorage.getItem("galaxy_outlast_lore_seen")||localStorage.setItem("galaxy_outlast_lore_seen","1")}catch(e){}})(),eg();const E=document.getElementById("slide-sfx-volume"),H=document.getElementById("val-sfx-volume");if(E&&H){const q=et.sfxVolume!==void 0?et.sfxVolume:.5;E.value=Math.round(q*100).toString(),H.textContent=Math.round(q*100)+"%";const $=ee=>{H.textContent=ee+"%",Ph(ee/100)};E.oninput=()=>{$(parseInt(E.value)||0)},E.onchange=()=>{$(parseInt(E.value)||0)}}const Q=document.getElementById("btn-configure-sound"),G=document.getElementById("adv-sounds-screen"),k=document.getElementById("btn-hide-adv-sounds");Q&&G&&(Q.onclick=()=>{updateAdvSoundsBossCuesUI();G.classList.remove("hidden")}),k&&G&&(k.onclick=()=>{lu();try{stopBossWarnSfx()}catch(e){}G.classList.add("hidden")});const b=(q,$)=>{const ee=document.getElementById(q);if(!ee)return;ee.textContent=et[$]?"ON":"OFF";ee.classList.toggle("on",!!et[$]);ee.onclick=()=>{const re=ee.textContent==="ON";ee.textContent=re?"OFF":"ON";ee.classList.toggle("on",!re);et[$]=!re;K0();if($==="sfx_boss_cues"){const sec=document.getElementById("adv-boss-cues-section");if(sec)sec.style.opacity=et[$]?"1":"0.55"}}};b("set-sfx-shoot-btn","sfx_shoot"),b("set-sfx-hit-btn","sfx_hit"),b("set-sfx-death-btn","sfx_enemy_death"),b("set-sfx-xp-btn","sfx_xp"),b("set-sfx-lvl-btn","sfx_lvlup"),b("set-sfx-phit-btn","sfx_player_hit"),b("set-sfx-siren-btn","sfx_siren"),b("set-sfx-boss-cues-btn","sfx_boss_cues"),b("set-hp-glow-btn","lowHpGlow"),b("set-hit-alert-btn","hitDamageAlert");const btnBoss=document.getElementById("set-boss-btn");btnBoss&&(btnBoss.onclick=()=>{const inRunB=!!(w.G&&w.G.running&&!w.G.over);if(inRunB){updateBossSettingUI();return;}if(!isBossModeUnlocked()){updateBossSettingUI();return;}const reB=btnBoss.textContent==="ON";btnBoss.textContent=reB?"OFF":"ON",btnBoss.classList.toggle("on",!reB),et.bossMode=!reB;if(et.bossMode)et.insanity=!1;K0(),xs(),updateDamageless(),updateBossSettingUI();});updateBossSettingUI();
+
+let advSelectedBoss = 0;
+function updateAdvSoundsBossCuesUI() {
+  const tabsContainer = document.getElementById("adv-boss-cue-tabs");
+  const variantsContainer = document.getElementById("adv-boss-cue-variants");
+  const labelEl = document.getElementById("adv-boss-cue-selected-lbl");
+  if (!tabsContainer || !variantsContainer) return;
+
+  const bossDef = al[advSelectedBoss] || al[0];
+  const bossType = bossDef.bossType;
+  const activeVariant = getBossCueVariant(bossType);
+  const variants = (bossAudioVariantNames && bossAudioVariantNames[bossType]) ? bossAudioVariantNames[bossType] : [
+    { name: 'Variant 1', desc: 'Default audio warning cue' },
+    { name: 'Variant 2', desc: 'Alternative procedural audio cue' },
+    { name: 'Variant 3', desc: 'Experimental procedural audio cue' }
+  ];
+
+  if (labelEl) {
+    labelEl.textContent = `B${advSelectedBoss + 1}: ${bossDef.name || ('BOSS ' + (advSelectedBoss + 1))}`;
+    labelEl.style.color = bossDef.clr || '#ffcc00';
+  }
+
+  let tabsHtml = '';
+  for (let b = 0; b < 10; b++) {
+    const isSelected = b === advSelectedBoss;
+    const bInfo = al[b] || { clr: '#00ffaa' };
+    tabsHtml += `
+      <button class="adv-boss-tab-btn" data-boss-idx="${b}" style="flex:1; min-width:32px; padding:4px 2px; font-size:10px; font-weight:bold; text-align:center; border-radius:4px; cursor:pointer; background:${isSelected ? bInfo.clr : 'rgba(15,25,35,0.9)'}; color:${isSelected ? '#000000' : '#ffffff'}; border:1px solid ${isSelected ? '#ffffff' : 'rgba(255,255,255,0.2)'}; box-shadow:${isSelected ? '0 0 8px ' + bInfo.clr : 'none'};">
+        B${b + 1}
+      </button>
+    `;
+  }
+  tabsContainer.innerHTML = tabsHtml;
+
+  let variantsHtml = '';
+  for (let v = 0; v < 3; v++) {
+    const isActive = v === activeVariant;
+    const vData = variants[v] || { name: `Variant ${v + 1}`, desc: '' };
+    variantsHtml += `
+      <div style="background:${isActive ? 'rgba(0,255,170,0.08)' : 'rgba(0,15,30,0.7)'}; border:1px solid ${isActive ? '#00ffaa' : 'rgba(255,255,255,0.12)'}; border-radius:6px; padding:6px 8px; margin-bottom:5px; transition:border-color 0.2s;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:9px; background:${isActive ? '#00ffaa' : 'rgba(255,255,255,0.15)'}; color:${isActive ? '#000' : '#fff'}; font-weight:bold; padding:1px 4px; border-radius:3px;">V${v + 1}</span>
+            <span style="font-size:11px; font-weight:bold; color:${isActive ? '#00ffaa' : '#ffffff'};">${vData.name}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button class="adv-btn-play-cue" data-boss-type="${bossType}" data-variant-idx="${v}" style="padding:2px 8px; font-size:10px; background:#00e5ff; color:#000; font-weight:bold; border:1px solid #00e5ff; border-radius:4px; cursor:pointer;">▶ PLAY</button>
+            <button class="adv-btn-select-cue" data-boss-type="${bossType}" data-variant-idx="${v}" style="padding:2px 8px; font-size:10px; background:${isActive ? '#00ffaa' : 'rgba(255,255,255,0.1)'}; color:${isActive ? '#000' : '#88e5ff'}; font-weight:bold; border:1px solid ${isActive ? '#00ffaa' : 'rgba(255,255,255,0.2)'}; border-radius:4px; cursor:pointer;">${isActive ? '✓ ACTIVE' : 'SELECT'}</button>
+          </div>
+        </div>
+        <div style="font-size:9px; color:#99bbcc; font-family:'Outfit',sans-serif; line-height:1.25;">${vData.desc}</div>
+      </div>
+    `;
+  }
+  variantsContainer.innerHTML = variantsHtml;
+}
+window.updateAdvSoundsBossCuesUI = updateAdvSoundsBossCuesUI;
+
+const advBossCuesSection = document.getElementById("adv-boss-cues-section");
+if (advBossCuesSection) {
+  advBossCuesSection.style.opacity = (et && et.sfx_boss_cues) ? "1" : "0.55";
+  advBossCuesSection.addEventListener("click", (e) => {
+    const tabBtn = e.target.closest(".adv-boss-tab-btn");
+    if (tabBtn) {
+      const bIdx = parseInt(tabBtn.getAttribute("data-boss-idx"), 10);
+      if (!isNaN(bIdx)) {
+        advSelectedBoss = bIdx;
+        updateAdvSoundsBossCuesUI();
+      }
+      return;
+    }
+    const playBtn = e.target.closest(".adv-btn-play-cue");
+    if (playBtn) {
+      const bType = parseInt(playBtn.getAttribute("data-boss-type"), 10);
+      const vIdx = parseInt(playBtn.getAttribute("data-variant-idx"), 10);
+      if (!isNaN(bType) && !isNaN(vIdx)) {
+        playBossWarnSfx(bType, vIdx, true);
+      }
+      return;
+    }
+    const selectBtn = e.target.closest(".adv-btn-select-cue");
+    if (selectBtn) {
+      const bType = parseInt(selectBtn.getAttribute("data-boss-type"), 10);
+      const vIdx = parseInt(selectBtn.getAttribute("data-variant-idx"), 10);
+      if (!isNaN(bType) && !isNaN(vIdx)) {
+        setBossCueVariant(bType, vIdx);
+        updateAdvSoundsBossCuesUI();
+      }
+      return;
+    }
+  });
+}
+updateAdvSoundsBossCuesUI();
 (()=>{
   const btnGfxLow = document.getElementById("gfx-preset-low");
   const btnGfxMed = document.getElementById("gfx-preset-medium");

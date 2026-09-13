@@ -1186,6 +1186,28 @@ function setBossCueVariant(bossType, variantIndex) {
     saved[b] = v;
     localStorage.setItem(BOSS_CUES_STORAGE_KEY, JSON.stringify(saved));
   } catch (e) {}
+
+  try {
+    if (Fe && sfxBuffers) {
+      const sr = Fe.sampleRate || 44100;
+      const OCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      if (OCtx) {
+        const ctx = new OCtx(1, Math.ceil(sr * 0.38), sr);
+        addBossBulletFireSfx(ctx, 0, ctx.destination, b, v);
+        ctx.startRendering().then(buf => {
+          sfxBuffers["bossFire_" + b] = buf;
+        }).catch(() => {});
+      }
+    }
+  } catch (e) {}
+
+  try {
+    if (typeof window !== "undefined") {
+      if (typeof window.updateAdvSoundsBossCuesUI === "function") window.updateAdvSoundsBossCuesUI();
+      if (typeof window.updateTestLabDockUI === "function") window.updateTestLabDockUI();
+    }
+  } catch (e) {}
+
   return v;
 }
 
