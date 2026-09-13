@@ -13,12 +13,21 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 import android.webkit.WebView;
 import android.webkit.WebSettings;
+import android.webkit.JavascriptInterface;
 import android.view.View;
 
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Elevate UI thread to Android's highest display/render priority (-8)
+        try {
+            Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         hideSystemUI();
 
         // 1. Window 32-bit RGBA hardware buffer format, keep screen on, and lock high-performance display mode
@@ -61,6 +70,7 @@ public class MainActivity extends BridgeActivity {
 
         if (this.bridge != null && this.bridge.getWebView() != null) {
             WebView webView = this.bridge.getWebView();
+            webView.addJavascriptInterface(new NativeBridge(), "AndroidNative");
             // Use LAYER_TYPE_NONE so Chromium renders directly to the Window surface
             // without creating an offscreen GPU FBO layer (matches Google Chrome Mobile performance).
             webView.setLayerType(View.LAYER_TYPE_NONE, null);
@@ -76,6 +86,51 @@ public class MainActivity extends BridgeActivity {
             
             webView.getSettings().setDomStorageEnabled(true);
             webView.getSettings().setDatabaseEnabled(true);
+        }
+    }
+
+    public void setDisplayRefreshRate(final float targetRate) {
+        try {
+            Window window = getWindow();
+            if (window == null) return;
+            WindowManager.LayoutParams params = window.getAttributes();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                android.view.Display display = getDisplay();
+                if (display != null) {
+                    android.view.Display.Mode[] modes = display.getSupportedModes();
+                    android.view.Display.Mode bestMode = null;
+                    float minDiff = Float.MAX_VALUE;
+                    for (android.view.Display.Mode mode : modes) {
+                        float diff = Math.abs(mode.getRefreshRate() - targetRate);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            bestMode = mode;
+                        }
+                    }
+                    if (bestMode != null) {
+                        params.preferredDisplayModeId = bestMode.getModeId();
+                    }
+                }
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                params.preferredRefreshRate = targetRate;
+            }
+            window.setAttributes(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public class NativeBridge {
+        @JavascriptInterface
+        public void setRefreshRate(final double rate) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setDisplayRefreshRate((float) rate);
+                }
+            });
         }
     }
 
@@ -99,6 +154,11 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onResume() {
         super.onResume();
+        try {
+            Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (this.bridge != null && this.bridge.getWebView() != null) {
             this.bridge.getWebView().onResume();
             this.bridge.getWebView().evaluateJavascript("window._onAppResume && window._onAppResume();", null);

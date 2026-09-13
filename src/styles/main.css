@@ -1918,12 +1918,16 @@ input[type=range]::-moz-range-thumb {
 
 /* Thermal & Battery Optimization: Freeze continuous GPU animations when UI is paused */
 body.ui-paused .drips,
+body.ui-paused .drip,
 body.ui-paused .drips svg,
 body.ui-paused .start-logo-pulse,
 body.ui-paused .pulse-launch-btn,
 body.ui-paused .siren-flash,
 body.ui-paused .pulse-skull,
 body.ui-paused .rotate-phone,
-body.ui-paused .glowpulse {
+body.ui-paused .glowpulse,
+body.ui-paused .up-card,
+body.ui-paused .up-card-header,
+body.ui-paused .up-badge {
   animation-play-state: paused !important;
 }
