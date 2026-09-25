@@ -114,70 +114,73 @@ canvas#c.hdr-mode {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0;
+  gap: 8px;
   flex-wrap: nowrap;
-  width: 195px;
+  width: 220px;
+  margin-bottom: 4px;
 }
 .hud-bar-group {
   display: flex;
   flex-direction: column;
-  gap: 1.5px;
+  gap: 2px;
   min-width: 0;
+  flex: 1 1 0;
+  width: auto;
 }
 .hud-bar-group:first-child {
-  margin-left: 18px;
-  flex: 0 0 76px;
-  width: 76px;
+  margin-left: 0;
+  flex: 1 1 0;
+  width: auto;
 }
 .hud-bar-group:last-child {
-  flex: 0 0 76px;
-  width: 76px;
+  flex: 1 1 0;
+  width: auto;
 }
 .hud-lbl {
-  font-size: 7.5px;
-  color: #0c8;
+  font-size: 8.5px;
+  color: #00ffaa;
   letter-spacing: 1px;
   text-transform: uppercase;
   font-family: Cinzel Decorative, serif;
-  text-shadow: 0 0 4px rgba(0,204,136,.5);
-  font-weight: 600;
-  line-height: 1;
+  text-shadow: 0 0 5px rgba(0,255,170,.6);
+  font-weight: 700;
+  line-height: 1.1;
   text-align: center;
   width: 100%;
   white-space: nowrap;
 }
 #exp-lbl {
-  color: #0af;
-  text-shadow: 0 0 4px rgba(0,170,255,.5);
+  color: #00e5ff;
+  text-shadow: 0 0 5px rgba(0,229,255,.6);
   letter-spacing: 0.8px;
 }
 .hud-bar-wrap {
   position: relative;
   width: 100%;
-  height: 12px;
-  border-radius: 3px;
-  background: #000a14;
+  height: 18px;
+  border-radius: 4px;
+  background: #000c18;
   overflow: hidden;
 }
 .hud-bar-wrap.hp-bar {
-  border: 1.5px solid #00cc88;
-  box-shadow: 0 0 6px #0c83;
+  border: 1.5px solid #00ffaa;
+  box-shadow: 0 0 8px rgba(0,255,170,.45), inset 0 0 4px rgba(0,0,0,.7);
 }
 .hud-bar-wrap.xp-bar {
-  border: 1.5px solid #00aaff;
-  box-shadow: 0 0 6px #0af3;
+  border: 1.5px solid #00d4ff;
+  box-shadow: 0 0 8px rgba(0,212,255,.45), inset 0 0 4px rgba(0,0,0,.7);
 }
 .hud-bar-fill {
   height: 100%;
   transition: width .15s;
 }
 #hp-fill {
-  background: linear-gradient(90deg,#063,#0f8);
-  box-shadow: 0 0 4px #0f89;
+  background: linear-gradient(90deg,#00884d 0%, #00e676 50%, #00ffaa 100%);
+  box-shadow: 0 0 6px rgba(0,255,170,.7);
 }
 #xp-fill {
-  background: linear-gradient(90deg,#038,#0af);
-  box-shadow: 0 0 4px #0af9;
+  background: linear-gradient(90deg,#0055bb 0%, #0099ff 50%, #00e5ff 100%);
+  box-shadow: 0 0 6px rgba(0,229,255,.7);
   transition: width .2s;
 }
 .hud-bar-val {
@@ -189,28 +192,17 @@ canvas#c.hdr-mode {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: 10.5px;
   font-family: 'Outfit', sans-serif;
   font-variant-numeric: tabular-nums;
   color: #fff;
-  text-shadow: 0 0 3px #000, 0 0 2px #000;
-  letter-spacing: .3px;
+  text-shadow: 0 0 4px #000, 0 1px 2px #000, 0 0 2px #000;
+  letter-spacing: .4px;
   pointer-events: none;
-  font-weight: 700;
+  font-weight: 800;
 }
 #eq-header {
-  font-family: Cinzel Decorative, serif;
-  font-size: 7.5px;
-  color: #ffd700;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  text-align: center;
-  width: 100%;
-  line-height: 1;
-  font-weight: 600;
-  flex-shrink: 0;
-  margin: 3.5px 0 3px 0;
+  display: none !important;
 }
 #max-badges {
   display: flex;

@@ -155,7 +155,6 @@ Error generating stack: `+n.message+`
           </div>
         </div>
       </div>
-      <div id="eq-header">EQUIPMENT</div>
       <div id="max-badges"></div>
     </div>
 
