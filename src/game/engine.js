@@ -3,7 +3,7 @@ const bulletCometImg = new Image();
 bulletCometImg.src = bulletCometSrc;
 window.bulletCometImg = bulletCometImg;
 /**
- * @fileoverview Unified Galaxy Outlast Game Engine.
+ * @fileoverview Unified Galactic Athlos Game Engine.
  */
 import { bossSkullImg, al } from './bosses.js';
 import {

@@ -116,7 +116,7 @@ canvas#c.hdr-mode {
   justify-content: space-between;
   gap: 8px;
   flex-wrap: nowrap;
-  width: 220px;
+  width: 195px;
   margin-bottom: 4px;
 }
 .hud-bar-group {

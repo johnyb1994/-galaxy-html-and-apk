@@ -1,4 +1,4 @@
-// src/main.js - Galaxy Outlast Main Entry Point
+// src/main.js - Galactic Athlos Main Entry Point
 import './styles/main.css';
 
 // 1. Boot Error Reporter
@@ -15,7 +15,7 @@ import './styles/main.css';
         box.addEventListener("click", function() { box.parentNode && box.parentNode.removeChild(box); });
       }
       shown = !0;
-      box.textContent = "GALAXY OUTLAST " + tag + " (build v1.35):\n" + String(msg).substring(0, 1200) + "\n\n[ TAP ANYWHERE ON THIS BOX TO DISMISS ]";
+      box.textContent = "GALACTIC ATHLOS " + tag + " (build v1.35):\n" + String(msg).substring(0, 1200) + "\n\n[ TAP ANYWHERE ON THIS BOX TO DISMISS ]";
     } catch(e) {}
   }
   window.__showFatal = function(msg) { show("ERROR", msg); };
@@ -222,8 +222,8 @@ Error generating stack: `+n.message+`
   <div id="start-screen" class="overlay">
     <div class="drips" id="drips1"></div>
     <div class="logo" style="font-family:'Cinzel Decorative',serif; font-size:clamp(36px,12vw,60px); font-weight:900; line-height:1.15; text-align:center; margin-bottom:20px; filter:drop-shadow(0 0 20px rgba(0,255,136,0.35)); display:flex; flex-direction:column; align-items:center;">
-      <span style="background:linear-gradient(to right, #00ffaa, #00d0ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:1.4em; font-family:'Cinzel Decorative',serif; font-weight:900; letter-spacing:2px;">GALAXY</span>
-      <span style="background:linear-gradient(to right, #ff0055, #ff7700); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:1.25em; font-family:'Cinzel Decorative',serif; font-weight:900; letter-spacing:4px; margin-top:16px;">OUTLAST</span>
+      <span style="background:linear-gradient(to right, #00ffaa, #00d0ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:1.22em; font-family:'Cinzel Decorative',serif; font-weight:900; letter-spacing:2px;">GALACTIC</span>
+      <span style="background:linear-gradient(to right, #ff0055, #ff7700); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:1.25em; font-family:'Cinzel Decorative',serif; font-weight:900; letter-spacing:4px; margin-top:16px;">ATHLOS</span>
     </div>
     
     <div class="hint" style="background:rgba(0, 10, 20, 0.75); border:1px solid rgba(0, 204, 136, 0.35); padding:24px 28px; border-radius:12px; box-shadow:0 0 20px rgba(0, 204, 136, 0.12); max-width:395px; margin:24px 0; text-align:center; line-height:1.6; font-family:'Cinzel',serif; font-size:clamp(17px,3.8vw,20px); color:#88bbcc; pointer-events:none;">
@@ -251,7 +251,7 @@ Error generating stack: `+n.message+`
   <!-- Lore Screen -->
   <div id="lore-screen" class="overlay hidden" style="z-index: 1000;">
     <div class="modal-window" style="max-width: 395px; width: 92%; text-align: center;">
-      <div class="logo" style="font-size: clamp(24px, 6vw, 36px); color: #00ff88; text-shadow: 0 0 20px #00cc88; margin-bottom: 24px;">GALAXY OUTLAST</div>
+      <div class="logo" style="font-size: clamp(24px, 6vw, 36px); color: #00ff88; text-shadow: 0 0 20px #00cc88; margin-bottom: 24px;">GALACTIC ATHLOS</div>
       <p style="color: #88bbcc; font-size: 18px; line-height: 1.6; font-family: 'Cinzel', serif; margin-bottom: 16px;">
         You are one of the few spaceship pilots left alive after the final alien attacks.
       </p>

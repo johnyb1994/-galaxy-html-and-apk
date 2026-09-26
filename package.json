@@ -1,7 +1,7 @@
 {
   "name": "galaxy-outlast",
   "version": "1.60.0",
-  "description": "Galaxy Outlast Mobile Game",
+  "description": "Galactic Athlos Mobile Game",
   "type": "module",
   "scripts": {
     "dev": "vite --host",

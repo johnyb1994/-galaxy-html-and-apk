@@ -1,5 +1,5 @@
 /**
- * @fileoverview Automated Compliance & Syntax Verification Suite for Galaxy Outlast.
+ * @fileoverview Automated Compliance & Syntax Verification Suite for Galactic Athlos.
  * Run via `npm test` or `npm run check`.
  */
 
@@ -18,7 +18,7 @@ function report(status, msg) {
   }
 }
 
-console.log('\x1b[36m=== GALAXY OUTLAST AUTOMATED VERIFICATION SUITE ===\x1b[0m\n');
+console.log('\x1b[36m=== GALACTIC ATHLOS AUTOMATED VERIFICATION SUITE ===\x1b[0m\n');
 
 // 1. Check www/ directory contents
 const wwwDir = path.resolve(__dirname, '../www');
@@ -35,14 +35,16 @@ function findHtmFiles(dir) {
   const list = fs.readdirSync(dir);
   list.forEach(file => {
     const fullPath = path.join(dir, file);
-    const stat = fs.statSync(fullPath);
-    if (stat.isDirectory()) {
-      if (file !== 'node_modules' && file !== '.git' && file !== 'android') {
-        results = results.concat(findHtmFiles(fullPath));
+    try {
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        if (file !== 'node_modules' && file !== '.git' && file !== 'android') {
+          results = results.concat(findHtmFiles(fullPath));
+        }
+      } else if (file.endsWith('.htm')) {
+        results.push(fullPath);
       }
-    } else if (file.endsWith('.htm')) {
-      results.push(fullPath);
-    }
+    } catch (_) {}
   });
   return results;
 }
