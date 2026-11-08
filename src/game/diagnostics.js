@@ -166,7 +166,8 @@
   };
   window.__devMetrics = devMetrics;
 
-  let storedState = localStorage.getItem("galaxy_dev_diag");
+  let storedState = null;
+  try { storedState = localStorage.getItem("galaxy_dev_diag"); } catch (e) {}
   let isDevDiagEnabled = storedState === "on";
   let isMinimized = false;
 
