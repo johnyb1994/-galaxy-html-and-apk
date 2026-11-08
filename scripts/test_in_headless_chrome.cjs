@@ -156,15 +156,13 @@ async function main() {
       var hitAlertToggledOn = hitAlertBtn ? hitAlertBtn.textContent : null;
       var hitSettingOn = window.et ? window.et.hitDamageAlert : null;
 
-      // Test Timing Mode selection buttons
-      var btnMode1 = document.getElementById("set-timing-mode1");
-      var btnMode2 = document.getElementById("set-timing-mode2");
-      var btnMode3 = document.getElementById("set-timing-mode3");
-      var btnMode5 = document.getElementById("set-timing-mode5");
-      if (btnMode2) btnMode2.click();
-      var timingModeAfter2 = window.et ? window.et.timingMode : null;
-      if (btnMode1) btnMode1.click();
-      var timingModeAfter1 = window.et ? window.et.timingMode : null;
+      // Test Timing Mode selection buttons (Normal vs Battery Saver)
+      var btnNormal = document.getElementById("set-timing-normal");
+      var btnBattery = document.getElementById("set-timing-battery");
+      if (btnBattery) btnBattery.click();
+      var timingModeAfterBattery = window.et ? window.et.timingMode : null;
+      if (btnNormal) btnNormal.click();
+      var timingModeAfterNormal = window.et ? window.et.timingMode : null;
 
       if (backBtn) backBtn.click();
       var closed = sc && sc.classList.contains("hidden");
@@ -186,9 +184,9 @@ async function main() {
         hitSettingOff: hitSettingOff,
         hitAlertToggledOn: hitAlertToggledOn,
         hitSettingOn: hitSettingOn,
-        timingButtonsFound: !!(btnMode1 && btnMode2 && btnMode3 && btnMode5),
-        timingModeAfter2: timingModeAfter2,
-        timingModeAfter1: timingModeAfter1
+        timingButtonsFound: !!(btnNormal && btnBattery),
+        timingModeAfterBattery: timingModeAfterBattery,
+        timingModeAfterNormal: timingModeAfterNormal
       };
     })())`
   });
@@ -292,15 +290,13 @@ async function main() {
       if (triggerBtn) triggerBtn.click();
       var timerAfterTrigger = g && g.activeBoss ? g.activeBoss.chargeTimer : null;
 
-      // Test Direct Timing Mode Switches
-      var m2 = document.getElementById("tl-mode-2");
-      if (m2) m2.click();
-      var m3 = document.getElementById("tl-mode-3");
-      if (m3) m3.click();
-      var m5 = document.getElementById("tl-mode-5");
-      if (m5) m5.click();
-      var m1 = document.getElementById("tl-mode-1");
-      if (m1) m1.click();
+      // Test Direct Timing Mode Switches (Normal vs Battery Saver)
+      var mBattery = document.getElementById("tl-mode-battery");
+      if (mBattery) mBattery.click();
+      var batteryActive = window.et && window.et.timingMode === "mode_battery_saver";
+      var mNormal = document.getElementById("tl-mode-normal");
+      if (mNormal) mNormal.click();
+      var normalActive = window.et && window.et.timingMode === "mode_normal";
       var exitBtn = document.getElementById("tl-btn-exit");
       if (exitBtn) exitBtn.click();
 
@@ -314,10 +310,10 @@ async function main() {
         bossSwitchSuccess: bossSwitchSuccess,
         savedVariantMatches: savedVariant === 1,
         timerAfterTrigger: timerAfterTrigger,
-        timingMode2Available: !!m2,
-        timingMode3Available: !!m3,
-        timingMode5Available: !!m5,
-        timingMode1Available: !!m1,
+        timingModeNormalAvailable: !!mNormal,
+        timingModeBatteryAvailable: !!mBattery,
+        normalSwitched: normalActive,
+        batterySwitched: batteryActive,
         exitReturned: !window.isTestLabActive
       };
     })())`

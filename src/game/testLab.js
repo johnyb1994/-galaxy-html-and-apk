@@ -11,35 +11,20 @@ import {
 
 let isTestLabActive = false;
 let testLabSelectedBoss = 0; // 0 to 9 (Boss 1 to Boss 10)
-let timingMode = 'mode1_clamped60'; // 'mode1_clamped60' | 'mode2_smooth_dt' | 'mode3_fixed_accumulator' | 'mode4_uncapped_native' | 'mode5_30hz_interpolated'
+let timingMode = 'mode_normal'; // 'mode_normal' | 'mode_battery_saver'
 let dockMinimized = false;
 let lastTelemetryUpdate = 0;
 
 export const TIMING_MODES = [
   {
-    id: 'mode1_clamped60',
-    name: 'Mode 1: Engine Clamped (Adaptive)',
-    desc: 'Adaptive sub-stepping (up to 3 steps on lag spikes >=38ms at 60Hz, >=22ms at 120Hz). Clamps frame delta to prevent speedups and bullet tunneling.'
+    id: 'mode_normal',
+    name: 'Normal: 60Hz Decoupled (Interpolated)',
+    desc: 'Fixed 60Hz accumulator with sub-frame interpolation across all refresh rates (60Hz, 90Hz, 120Hz). Zero speed change when FPS changes.'
   },
   {
-    id: 'mode2_smooth_dt',
-    name: 'Mode 2: Smooth Variable dt (Delta Time)',
-    desc: 'Feeds exact elapsed delta time directly into physics (stepDt = delta). 100% fluid, continuous finger tracking without fixed-step quantization.'
-  },
-  {
-    id: 'mode3_fixed_accumulator',
-    name: 'Mode 3: Fixed Accumulator (60Hz Decoupled Physics)',
-    desc: 'Decouples physics from refresh rate. Always ticks at fixed 60Hz (16.6ms) across all displays (60Hz, 90Hz, 120Hz) with renderAlpha interpolation.'
-  },
-  {
-    id: 'mode4_uncapped_native',
-    name: 'Mode 4: Native Uncapped RAF (Hardware VSync)',
-    desc: '1:1 lock with hardware screen refreshes. Timestep is normalized to target refresh rate so movement speed stays 1.0x normal time.'
-  },
-  {
-    id: 'mode5_30hz_interpolated',
-    name: 'Mode 5: 30Hz Decoupled (2:1 Interpolated)',
-    desc: '30Hz physics tick rate with 2:1 rendering interpolation. Ultra-low battery & thermal load.'
+    id: 'mode_battery_saver',
+    name: 'Battery Saver: 30Hz Decoupled (2:1)',
+    desc: 'Decoupled 30Hz physics with 2:1 rendering interpolation. Constant gameplay speed with minimum CPU, thermal & battery load.'
   }
 ];
 
@@ -49,21 +34,24 @@ export function isTestLab() {
 
 export function getTimingMode() {
   if (window.et && window.et.timingMode) {
-    timingMode = window.et.timingMode;
+    timingMode = (window.et.timingMode === 'mode_battery_saver' || window.et.timingMode === 'mode5_30hz_interpolated' || window.et.timingMode === 'battery_saver') ? 'mode_battery_saver' : 'mode_normal';
   }
-  return timingMode || 'mode1_clamped60';
+  return timingMode || 'mode_normal';
 }
 
 export function setTimingMode(mode) {
-  if (TIMING_MODES.some(m => m.id === mode)) {
-    timingMode = mode;
-    if (window.et) {
-      window.et.timingMode = mode;
-      if (typeof window.K0 === 'function') window.K0();
-    }
-    if (window.updateSettingsTimingUI) window.updateSettingsTimingUI();
-    updateDockUI();
+  if (mode === 'mode5_30hz_interpolated' || mode === 'mode_battery_saver' || mode === 'battery_saver') {
+    mode = 'mode_battery_saver';
+  } else {
+    mode = 'mode_normal';
   }
+  timingMode = mode;
+  if (window.et) {
+    window.et.timingMode = mode;
+    if (typeof window.K0 === 'function') window.K0();
+  }
+  if (window.updateSettingsTimingUI) window.updateSettingsTimingUI();
+  updateDockUI();
 }
 
 export function getSelectedTestLabBoss() {
@@ -358,25 +346,13 @@ function setupDockEvents(dock) {
       return;
     }
 
-    // Timing mode buttons
-    if (target.id === 'tl-mode-1' || target.closest('#tl-mode-1')) {
-      setTimingMode('mode1_clamped60');
+    // Timing mode buttons (Constant speed modes: Normal 60Hz & 30Hz Battery)
+    if (target.id === 'tl-mode-normal' || target.closest('#tl-mode-normal') || target.id === 'tl-mode-1' || target.closest('#tl-mode-1') || target.id === 'tl-mode-3' || target.closest('#tl-mode-3')) {
+      setTimingMode('mode_normal');
       return;
     }
-    if (target.id === 'tl-mode-2' || target.closest('#tl-mode-2')) {
-      setTimingMode('mode2_smooth_dt');
-      return;
-    }
-    if (target.id === 'tl-mode-3' || target.closest('#tl-mode-3')) {
-      setTimingMode('mode3_fixed_accumulator');
-      return;
-    }
-    if (target.id === 'tl-mode-4' || target.closest('#tl-mode-4')) {
-      setTimingMode('mode4_uncapped_native');
-      return;
-    }
-    if (target.id === 'tl-mode-5' || target.closest('#tl-mode-5')) {
-      setTimingMode('mode5_30hz_interpolated');
+    if (target.id === 'tl-mode-battery' || target.closest('#tl-mode-battery') || target.id === 'tl-mode-2' || target.closest('#tl-mode-2') || target.id === 'tl-mode-5' || target.closest('#tl-mode-5')) {
+      setTimingMode('mode_battery_saver');
       return;
     }
   });
@@ -544,24 +520,15 @@ export function updateDockUI() {
       <div>Spikes: <strong id="tl-stat-spikes" style="color:#00ffaa;">0</strong></div>
     </div>
 
-    <!-- Timing Methods Switcher (4 Direct Buttons) -->
+    <!-- Timing Methods Switcher (2 Speed-Constant Modes) -->
     <div style="margin-bottom:4px;">
       <div style="font-size:10px; color:#88bbcc; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Timing & Physics Method:</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:6px;">
-        <button id="tl-mode-1" class="tl-btn" style="padding:6px 4px; font-size:10px; font-weight:bold; text-align:center; background:${timingMode === 'mode1_clamped60' ? '#00e5ff' : 'rgba(0,40,60,0.85)'}; color:${timingMode === 'mode1_clamped60' ? '#000' : '#88e5ff'}; border-color:${timingMode === 'mode1_clamped60' ? '#00e5ff' : 'rgba(0,229,255,0.3)'};">
-          1: CLAMPED
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
+        <button id="tl-mode-normal" class="tl-btn" style="padding:7px 4px; font-size:10px; font-weight:bold; text-align:center; background:${timingMode === 'mode_normal' ? '#00e5ff' : 'rgba(0,40,60,0.85)'}; color:${timingMode === 'mode_normal' ? '#000' : '#88e5ff'}; border-color:${timingMode === 'mode_normal' ? '#00e5ff' : 'rgba(0,229,255,0.3)'};">
+          ⚡ 1: NORMAL (60Hz)
         </button>
-        <button id="tl-mode-2" class="tl-btn" style="padding:6px 4px; font-size:10px; font-weight:bold; text-align:center; background:${timingMode === 'mode2_smooth_dt' ? '#00ffaa' : 'rgba(0,50,40,0.85)'}; color:${timingMode === 'mode2_smooth_dt' ? '#000' : '#00ffaa'}; border-color:${timingMode === 'mode2_smooth_dt' ? '#00ffaa' : 'rgba(0,255,170,0.3)'};">
-          2: SMOOTH DT
-        </button>
-        <button id="tl-mode-3" class="tl-btn" style="padding:6px 4px; font-size:10px; font-weight:bold; text-align:center; background:${timingMode === 'mode3_fixed_accumulator' ? '#ffcc00' : 'rgba(50,40,0,0.85)'}; color:${timingMode === 'mode3_fixed_accumulator' ? '#000' : '#ffcc00'}; border-color:${timingMode === 'mode3_fixed_accumulator' ? '#ffcc00' : 'rgba(255,204,0,0.3)'};">
-          3: FIXED ACC
-        </button>
-        <button id="tl-mode-4" class="tl-btn" style="padding:6px 4px; font-size:10px; font-weight:bold; text-align:center; background:${timingMode === 'mode4_uncapped_native' ? '#cc66ff' : 'rgba(50,10,60,0.85)'}; color:${timingMode === 'mode4_uncapped_native' ? '#000' : '#cc66ff'}; border-color:${timingMode === 'mode4_uncapped_native' ? '#cc66ff' : 'rgba(204,102,255,0.3)'};">
-          4: UNCAPPED
-        </button>
-        <button id="tl-mode-5" class="tl-btn" style="grid-column: 1 / -1; padding:7px 4px; font-size:10px; font-weight:bold; text-align:center; background:${timingMode === 'mode5_30hz_interpolated' ? '#ff0055' : 'rgba(60,10,25,0.85)'}; color:${timingMode === 'mode5_30hz_interpolated' ? '#fff' : '#ff6688'}; border-color:${timingMode === 'mode5_30hz_interpolated' ? '#ff0055' : 'rgba(255,0,85,0.4)'}; box-shadow:${timingMode === 'mode5_30hz_interpolated' ? '0 0 10px rgba(255,0,85,0.5)' : 'none'};">
-          ⭐ 5: 30Hz DECOUPLED (2:1 INTERPOLATED)
+        <button id="tl-mode-battery" class="tl-btn" style="padding:7px 4px; font-size:10px; font-weight:bold; text-align:center; background:${timingMode === 'mode_battery_saver' ? '#ff0055' : 'rgba(60,10,25,0.85)'}; color:${timingMode === 'mode_battery_saver' ? '#fff' : '#ff6688'}; border-color:${timingMode === 'mode_battery_saver' ? '#ff0055' : 'rgba(255,0,85,0.4)'}; box-shadow:${timingMode === 'mode_battery_saver' ? '0 0 10px rgba(255,0,85,0.5)' : 'none'};">
+          🔋 2: 30Hz BATTERY
         </button>
       </div>
       <div style="font-size:9.5px; color:#bbddee; background:rgba(0,20,35,0.8); border:1px solid rgba(0,229,255,0.2); border-radius:4px; padding:4px 6px; line-height:1.35;">
