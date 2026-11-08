@@ -15,7 +15,7 @@ import './styles/main.css';
         box.addEventListener("click", function() { box.parentNode && box.parentNode.removeChild(box); });
       }
       shown = !0;
-      box.textContent = "GALACTIC ATHLOS " + tag + " (build v1.35):\n" + String(msg).substring(0, 1200) + "\n\n[ TAP ANYWHERE ON THIS BOX TO DISMISS ]";
+      box.textContent = "GALACTIC ATHLOS " + tag + " (build v1.63):\n" + String(msg).substring(0, 1200) + "\n\n[ TAP ANYWHERE ON THIS BOX TO DISMISS ]";
     } catch(e) {}
   }
   window.__showFatal = function(msg) { show("ERROR", msg); };
@@ -442,6 +442,10 @@ Error generating stack: `+n.message+`
         <div class="settings-row">
           <span class="settings-label">🎮 In-Game FPS Counter</span>
           <button class="toggle-btn" id="set-show-fps-btn">OFF</button>
+        </div>
+        <div class="settings-row" id="set-dev-diag-row">
+          <span class="settings-label">🛠 Dev Diagnostics</span>
+          <button class="toggle-btn" id="set-dev-diag-btn">OFF</button>
         </div>
 
         <!-- Physics & Timing Engine (2 Speed-Constant Modes) -->

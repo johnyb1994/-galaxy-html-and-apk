@@ -66,6 +66,7 @@ export function applyMaxPlayerWeapons(g) {
   g.invulnerable = true;
   g.godMode = true;
   g.hp = 9999;
+  g.maxhp = 9999;
   g.maxHp = 9999;
   g.iTimer = 999999999;
 
@@ -371,7 +372,7 @@ export function updateTestLabTelemetry(fps, delta, subSteps, computeMs) {
   if (!g) return;
 
   // Maintain Invulnerability for both Player and Boss
-  g.hp = g.maxHp = 9999;
+  g.hp = g.maxhp = g.maxHp = 9999;
   g.godMode = true;
   g.invulnerable = true;
   if (g.activeBoss) {
